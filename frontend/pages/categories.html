@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Management - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Category Specific Styles */
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: rgba(79, 70, 229, 0.1);
+            color: #4F46E5;
+        }
+        
+        .category-tree {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .category-tree ul {
+            list-style: none;
+            padding-left: 2rem;
+        }
+        
+        .category-tree li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .category-tree li:last-child {
+            border-bottom: none;
+        }
+        
+        .category-tree .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .category-tree .category-item:hover {
+            background-color: #f8fafc;
+        }
+        
+        .category-tree .category-item .category-name {
+            font-weight: 500;
+        }
+        
+        .category-tree .category-item .category-code {
+            font-size: 0.75rem;
+            color: #6B7280;
+            font-family: monospace;
+            margin-left: 0.5rem;
+        }
+        
+        .category-tree .category-item .category-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .category-tree .category-item .category-actions .btn {
+            padding: 0.15rem 0.4rem;
+            font-size: 0.7rem;
+        }
+        
+        .category-tree .category-item .subcategory-toggle {
+            cursor: pointer;
+            margin-right: 0.5rem;
+            color: #6B7280;
+            transition: transform 0.2s;
+        }
+        
+        .category-tree .category-item .subcategory-toggle.open {
+            transform: rotate(90deg);
+        }
+        
+        .category-tree .level-0 .category-item {
+            background: #f8fafc;
+            border-left: 4px solid #4F46E5;
+        }
+        
+        .category-tree .level-1 .category-item {
+            border-left: 4px solid #7C3AED;
+        }
+        
+        .category-tree .level-2 .category-item {
+            border-left: 4px solid #10B981;
+        }
+        
+        .category-tree .level-3 .category-item {
+            border-left: 4px solid #F59E0B;
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        /* Form Styles */
+        .form-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4F46E5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            padding: 0.15rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.active { background: #D1FAE5; color: #065F46; }
+        .status-badge.inactive { background: #FEE2E2; color: #991B1B; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Category Management</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-folder-open me-2 text-primary"></i>Category Management
+                    </h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="openAddCategoryModal()">
+                            <i class="fas fa-plus-circle me-1"></i>Add Category
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput" 
+                                       placeholder="Search by name or code..." oninput="filterCategories()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterCategories()">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Tree -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-sitemap me-2"></i>Categories Hierarchy
+                            <span class="badge bg-primary ms-2" id="categoryCount">0</span>
+                        </h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadCategories()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="categoryTree">
+                            <!-- Category tree will be rendered here -->
+                            <div class="text-center py-4 text-muted" id="loadingCategories">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Loading categories...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- Add/Edit Category Modal -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-folder-plus me-2 text-primary"></i>
+                        <span id="categoryModalTitle">Add New Category</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="categoryForm" novalidate>
+                        <input type="hidden" id="editCategoryId">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Category Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="categoryName" required>
+                            <div class="invalid-feedback">Category name is required</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Category Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="categoryCode" required>
+                            <div class="invalid-feedback">Category code is required</div>
+                            <div class="form-text">Unique alphanumeric code (e.g., IT, EE, PROG)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Parent Category</label>
+                            <select class="form-select" id="parentCategory">
+                                <option value="">None (Root Category)</option>
+                                <!-- Options populated dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="categoryDescription" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Display Order</label>
+                            <input type="number" class="form-control" id="displayOrder" value="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="categoryStatus">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" id="saveCategoryBtn">
+                        <i class="fas fa-save me-1"></i>Save Category
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+    <script src="../js/categories-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let categoriesData = [];
+        let deleteCategoryId = null;
+        let editCategoryId = null;
+        
+        const categoryModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load categories
+            loadCategories();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Save category button
+            document.getElementById('saveCategoryBtn').addEventListener('click', saveCategory);
+            
+            // Confirm button
+            document.getElementById('confirmBtn').addEventListener('click', confirmDelete);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Categories
+        // ============================================
+        async function loadCategories() {
+            showLoading();
+            
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                const params = new URLSearchParams({
+                    search: search,
+                    status: status
+                });
+                
+                const result = await apiCall(`/categories?${params.toString()}`);
+                
+                categoriesData = result.data || [];
+                document.getElementById('categoryCount').textContent = categoriesData.length;
+                
+                renderTree(categoriesData);
+                populateParentSelect(categoriesData);
+                
+            } catch (error) {
+                showToast('Failed to load categories: ' + error.message, 'error');
+                document.getElementById('categoryTree').innerHTML = `
+                    <div class="text-center py-4 text-danger">
+                        <i class="fas fa-exclamation-circle fa-3x d-block mb-2"></i>
+                        <p>Failed to load categories. Please refresh the page.</p>
+                        <button class="btn btn-sm btn-primary" onclick="loadCategories()">
+                            <i class="fas fa-sync-alt me-1"></i>Retry
+                        </button>
+                    </div>
+                `;
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Build Category Tree
+        // ============================================
+        function buildTree(categories, parentId = null) {
+            const result = [];
+            const items = categories.filter(c => c.parent_category_id === parentId || 
+                (parentId === null && !c.parent_category_id));
+            
+            // Sort by display order
+            items.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+            
+            for (const item of items) {
+                const children = buildTree(categories, item.category_id);
+                result.push({
+                    ...item,
+                    children: children
+                });
+            }
+            
+            return result;
+        }
+        
+        // ============================================
+        // Render Tree
+        // ============================================
+        function renderTree(categories) {
+            const container = document.getElementById('categoryTree');
+            
+            if (!categories || categories.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-folder-open fa-3x d-block mb-2"></i>
+                        <p>No categories found. Add your first category!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const tree = buildTree(categories);
+            let html = '<ul class="category-tree">';
+            html += renderTreeNodes(tree, 0);
+            html += '</ul>';
+            
+            container.innerHTML = html;
+        }
+        
+        function renderTreeNodes(nodes, level) {
+            let html = '';
+            
+            for (const node of nodes) {
+                const hasChildren = node.children && node.children.length > 0;
+                const statusClass = node.status === 'Active' ? 'active' : 'inactive';
+                
+                html += `
+                    <li>
+                        <div class="category-item level-${level}">
+                            <div class="d-flex align-items-center">
+                                ${hasChildren ? `
+                                    <span class="subcategory-toggle" onclick="toggleSubcategories(this)">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                ` : `
+                                    <span class="subcategory-toggle" style="visibility:hidden;">
+                                        <i class="fas fa-circle" style="font-size:0.4rem;"></i>
+                                    </span>
+                                `}
+                                <div class="category-icon me-2">
+                                    <i class="fas ${node.icon || 'fa-folder'}"></i>
+                                </div>
+                                <div>
+                                    <span class="category-name">${node.category_name}</span>
+                                    <span class="category-code">${node.category_code}</span>
+                                    <span class="status-badge ${statusClass}">${node.status || 'Active'}</span>
+                                    ${node.description ? `<small class="text-muted d-block">${node.description}</small>` : ''}
+                                </div>
+                            </div>
+                            <div class="category-actions">
+                                <button class="btn btn-sm btn-outline-info" onclick="viewCategory(${node.category_id})" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="editCategory(${node.category_id})" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="openDeleteModal(${node.category_id})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${hasChildren ? `
+                            <ul style="display: none;" class="subcategory-list">
+                                ${renderTreeNodes(node.children, level + 1)}
+                            </ul>
+                        ` : ''}
+                    </li>
+                `;
+            }
+            
+            return html;
+        }
+        
+        // ============================================
+        // Toggle Subcategories
+        // ============================================
+        function toggleSubcategories(element) {
+            const icon = element.querySelector('i');
+            const list = element.closest('li').querySelector('.subcategory-list');
+            
+            if (list) {
+                if (list.style.display === 'none') {
+                    list.style.display = '';
+                    icon.className = 'fas fa-chevron-down';
+                } else {
+                    list.style.display = 'none';
+                    icon.className = 'fas fa-chevron-right';
+                }
+            }
+        }
+        
+        // ============================================
+        // Populate Parent Select
+        // ============================================
+        function populateParentSelect(categories) {
+            const select = document.getElementById('parentCategory');
+            const currentId = parseInt(document.getElementById('editCategoryId').value);
+            
+            // Clear options except the first one
+            select.innerHTML = '<option value="">None (Root Category)</option>';
+            
+            // Add categories as options (excluding current category to prevent self-reference)
+            for (const cat of categories) {
+                if (cat.category_id === currentId) continue;
+                // Check if this category is not a child of current (to prevent circular)
+                if (isChildOf(cat.category_id, currentId, categories)) continue;
+                
+                const option = document.createElement('option');
+                option.value = cat.category_id;
+                const level = getCategoryLevel(cat.category_id, categories);
+                option.textContent = '— '.repeat(level) + cat.category_name;
+                select.appendChild(option);
+            }
+        }
+        
+        function getCategoryLevel(categoryId, categories, level = 0) {
+            const cat = categories.find(c => c.category_id === categoryId);
+            if (!cat || !cat.parent_category_id) return level;
+            const parent = categories.find(c => c.category_id === cat.parent_category_id);
+            if (!parent) return level;
+            return getCategoryLevel(parent.category_id, categories, level + 1);
+        }
+        
+        function isChildOf(categoryId, parentId, categories) {
+            const cat = categories.find(c => c.category_id === categoryId);
+            if (!cat || !cat.parent_category_id) return false;
+            if (cat.parent_category_id === parentId) return true;
+            return isChildOf(cat.parent_category_id, parentId, categories);
+        }
+        
+        // ============================================
+        // Filter Functions
+        // ============================================
+        function filterCategories() {
+            loadCategories();
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            loadCategories();
+        }
+        
+        function refreshTree() {
+            loadCategories();
+        }
+        
+        // ============================================
+        // Open Add Category Modal
+        // ============================================
+        function openAddCategoryModal() {
+            editCategoryId = null;
+            document.getElementById('categoryModalTitle').textContent = 'Add New Category';
+            document.getElementById('editCategoryId').value = '';
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryStatus').value = 'Active';
+            document.getElementById('displayOrder').value = 0;
+            populateParentSelect(categoriesData);
+            categoryModal.show();
+        }
+        
+        // ============================================
+        // Edit Category
+        // ============================================
+        async function editCategory(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/categories/${id}`);
+                const category = result.data;
+                
+                editCategoryId = id;
+                document.getElementById('categoryModalTitle').textContent = 'Edit Category';
+                document.getElementById('editCategoryId').value = id;
+                document.getElementById('categoryName').value = category.category_name || '';
+                document.getElementById('categoryCode').value = category.category_code || '';
+                document.getElementById('parentCategory').value = category.parent_category_id || '';
+                document.getElementById('categoryDescription').value = category.description || '';
+                document.getElementById('displayOrder').value = category.display_order || 0;
+                document.getElementById('categoryStatus').value = category.status || 'Active';
+                
+                populateParentSelect(categoriesData);
+                categoryModal.show();
+            } catch (error) {
+                showToast('Failed to load category data: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // View Category
+        // ============================================
+        function viewCategory(id) {
+            const category = categoriesData.find(c => c.category_id === id);
+            if (!category) {
+                showToast('Category not found', 'error');
+                return;
+            }
+            
+            const parentName = category.parent_category_id 
+                ? categoriesData.find(c => c.category_id === category.parent_category_id)?.category_name || 'Unknown'
+                : 'Root (No Parent)';
+            
+            const childCount = categoriesData.filter(c => c.parent_category_id === id).length;
+            const statusClass = category.status === 'Active' ? 'active' : 'inactive';
+            
+            showToast(`
+                <div class="text-start">
+                    <h6><strong>${category.category_name}</strong></h6>
+                    <hr class="my-2">
+                    <div><strong>Code:</strong> ${category.category_code}</div>
+                    <div><strong>Parent:</strong> ${parentName}</div>
+                    <div><strong>Description:</strong> ${category.description || 'No description'}</div>
+                    <div><strong>Subcategories:</strong> ${childCount}</div>
+                    <div><strong>Status:</strong> <span class="status-badge ${statusClass}">${category.status}</span></div>
+                    <div><strong>Display Order:</strong> ${category.display_order || 0}</div>
+                </div>
+            `, 'info');
+        }
+        
+        // ============================================
+        // Save Category
+        // ============================================
+        async function saveCategory() {
+            const id = document.getElementById('editCategoryId').value;
+            const name = document.getElementById('categoryName').value.trim();
+            const code = document.getElementById('categoryCode').value.trim();
+            const parentId = document.getElementById('parentCategory').value;
+            
+            // Validate
+            if (!name) {
+                showToast('Category name is required', 'warning');
+                return;
+            }
+            
+            if (!code) {
+                showToast('Category code is required', 'warning');
+                return;
+            }
+            
+            const data = {
+                category_name: name,
+                category_code: code,
+                parent_category_id: parentId || null,
+                description: document.getElementById('categoryDescription').value.trim(),
+                display_order: parseInt(document.getElementById('displayOrder').value) || 0,
+                status: document.getElementById('categoryStatus').value
+            };
+            
+            try {
+                showLoading();
+                
+                let result;
+                if (id) {
+                    result = await apiCall(`/categories/${id}`, 'PUT', data);
+                    showToast('Category updated successfully!', 'success');
+                } else {
+                    result = await apiCall('/categories', 'POST', data);
+                    showToast('Category created successfully!', 'success');
+                }
+                
+                categoryModal.hide();
+                loadCategories();
+                
+            } catch (error) {
+                showToast('Failed to save category: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Delete Modal
+        // ============================================
+        function openDeleteModal(id) {
+            const category = categoriesData.find(c => c.category_id === id);
+            if (!category) {
+                showToast('Category not found', 'error');
+                return;
+            }
+            
+            // Check if category has subcategories
+            const childCount = categoriesData.filter(c => c.parent_category_id === id).length;
+            let warning = '';
+            if (childCount > 0) {
+                warning = `<br><br><strong class="text-warning">⚠️ Warning:</strong> This category has ${childCount} subcategory(ies). They will also be deleted.`;
+            }
+            
+            deleteCategoryId = id;
+            document.getElementById('confirmBody').innerHTML = `
+                Are you sure you want to delete category <strong>"${category.category_name}"</strong>? 
+                This action cannot be undone.${warning}
+            `;
+            confirmModal.show();
+        }
+        
+        // ============================================
+        // Confirm Delete
+        // ============================================
+        async function confirmDelete() {
+            if (!deleteCategoryId) return;
+            
+            try {
+                showLoading();
+                await apiCall(`/categories/${deleteCategoryId}`, 'DELETE');
+                showToast('Category deleted successfully!', 'success');
+                confirmModal.hide();
+                loadCategories();
+            } catch (error) {
+                showToast('Failed to delete category: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                deleteCategoryId = null;
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+            confirmModal.show();
+            
+            document.getElementById('confirmBtn').onclick = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            };
+        }
+        
+        console.log('📁 Category Management page loaded successfully');
+        console.log('🔗 API Integration: api.js + categories-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

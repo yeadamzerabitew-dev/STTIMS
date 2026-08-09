@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enrollment Management - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Enrollment Specific Styles */
+        .enrollment-number {
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #4F46E5;
+            background: rgba(79, 70, 229, 0.08);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .progress-wrapper {
+            min-width: 100px;
+        }
+        
+        .progress-wrapper .progress {
+            height: 6px;
+            border-radius: 4px;
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .table-container .table {
+            min-width: 1100px;
+        }
+        
+        /* Enrollment Form */
+        .enrollment-summary {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .enrollment-summary .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .enrollment-summary .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .enrollment-summary .summary-label {
+            color: #6B7280;
+        }
+        
+        .enrollment-summary .summary-value {
+            font-weight: 600;
+        }
+        
+        .fee-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4F46E5;
+        }
+        
+        .form-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4F46E5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .form-section {
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Status Badges */
+        .badge-enrolled { background: #DBEAFE; color: #1E40AF; }
+        .badge-active { background: #D1FAE5; color: #065F46; }
+        .badge-completed { background: #A78BFA; color: #fff; }
+        .badge-dropped { background: #FEE2E2; color: #991B1B; }
+        .badge-suspended { background: #FEF3C7; color: #92400E; }
+        
+        .payment-badge {
+            padding: 0.15rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .payment-badge.paid { background: #D1FAE5; color: #065F46; }
+        .payment-badge.pending { background: #FEF3C7; color: #92400E; }
+        .payment-badge.partial { background: #DBEAFE; color: #1E40AF; }
+        .payment-badge.scholarship { background: #EDE9FE; color: #5B21B6; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Enrollment Management</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-edit me-2 text-primary"></i>Enrollment Management
+                    </h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="openAddEnrollmentModal()">
+                            <i class="fas fa-user-plus me-1"></i>New Enrollment
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput" 
+                                       placeholder="Search by trainee or course..." oninput="filterEnrollments()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterEnrollments()">
+                                <option value="">All Status</option>
+                                <option value="Enrolled">Enrolled</option>
+                                <option value="Active">Active</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Dropped">Dropped</option>
+                                <option value="Suspended">Suspended</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Payment Status</label>
+                            <select class="form-select" id="paymentFilter" onchange="filterEnrollments()">
+                                <option value="">All Payments</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Partial">Partial</option>
+                                <option value="Scholarship">Scholarship</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <button class="btn btn-outline-secondary btn-sm me-1" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-export me-1"></i>Export
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataExcel(); return false;"><i class="fas fa-file-excel me-2 text-success"></i>Export to Excel</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataPDF(); return false;"><i class="fas fa-file-pdf me-2 text-danger"></i>Export to PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enrollments Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Enrollments List
+                            <span class="badge bg-primary ms-2" id="enrollmentCount">0</span>
+                        </h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadEnrollments()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table table-striped table-hover mb-0" id="enrollmentsTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Enrollment #</th>
+                                        <th>Trainee</th>
+                                        <th>Course</th>
+                                        <th>Batch</th>
+                                        <th>Payment</th>
+                                        <th>Progress</th>
+                                        <th>Status</th>
+                                        <th style="width: 120px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="enrollmentsTableBody">
+                                    <!-- Enrollments loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="text-muted small" id="tableInfo">Showing 0 of 0 enrollments</span>
+                        <nav id="paginationContainer"></nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- New Enrollment Modal -->
+    <div class="modal fade" id="addEnrollmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2 text-primary"></i>New Enrollment
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="enrollmentForm" novalidate>
+                        <input type="hidden" id="editEnrollmentId">
+                        
+                        <!-- Select Trainee & Batch -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-user-graduate me-2"></i>Select Trainee & Batch</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Trainee <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="enrollmentTrainee" required>
+                                            <option value="">Select Trainee</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a trainee</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Batch <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="enrollmentBatch" required>
+                                            <option value="">Select Batch</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a batch</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enrollment Summary -->
+                        <div class="enrollment-summary" id="enrollmentSummary" style="display: none;">
+                            <h6 class="form-section-title"><i class="fas fa-receipt me-2"></i>Enrollment Summary</h6>
+                            <div class="summary-item">
+                                <span class="summary-label">Course</span>
+                                <span class="summary-value" id="summaryCourse">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Batch</span>
+                                <span class="summary-value" id="summaryBatch">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Course Fee</span>
+                                <span class="summary-value" id="summaryFee">ETB 0.00</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Available Seats</span>
+                                <span class="summary-value" id="summarySeats">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Enrollment Date</span>
+                                <span class="summary-value" id="summaryDate">Today</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Details -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-credit-card me-2"></i>Payment Details</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Payment Status <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="paymentStatus" required>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Paid">Paid</option>
+                                            <option value="Partial">Partial</option>
+                                            <option value="Scholarship">Scholarship</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select payment status</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Payment Amount</label>
+                                        <input type="number" class="form-control" id="paymentAmount" min="0" step="0.01">
+                                        <div class="form-text">Leave empty for pending payments</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Payment Method</label>
+                                        <select class="form-select" id="paymentMethod">
+                                            <option value="">Select Method</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Bank Transfer">Bank Transfer</option>
+                                            <option value="Mobile Money">Mobile Money</option>
+                                            <option value="Credit Card">Credit Card</option>
+                                            <option value="Scholarship">Scholarship</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Discount Amount</label>
+                                        <input type="number" class="form-control" id="discountAmount" min="0" step="0.01" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="enrollmentNotes" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" id="saveEnrollmentBtn">
+                        <i class="fas fa-save me-1"></i>Enroll Trainee
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Enrollment Modal -->
+    <div class="modal fade" id="viewEnrollmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit me-2 text-primary"></i>Enrollment Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewEnrollmentBody">
+                    <!-- Enrollment details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+
+    <!-- Export libraries (Excel + PDF) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="../js/export-utils.js"></script>
+    <script src="../js/enrollments-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let currentPage = 1;
+        let totalPages = 1;
+        let perPage = 10;
+        let enrollmentsData = [];
+        let deleteEnrollmentId = null;
+        let editEnrollmentId = null;
+        let traineesList = [];
+        let batchesList = [];
+        let selectedBatchData = null;
+        
+        const enrollmentModal = new bootstrap.Modal(document.getElementById('addEnrollmentModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewEnrollmentModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load trainees and batches for dropdowns
+            loadTrainees();
+            loadBatches();
+            
+            // Load enrollments
+            loadEnrollments();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Save enrollment button
+            document.getElementById('saveEnrollmentBtn').addEventListener('click', saveEnrollment);
+            
+            // Confirm button
+            document.getElementById('confirmBtn').addEventListener('click', confirmDelete);
+            
+            // Batch selection change - update summary
+            document.getElementById('enrollmentBatch').addEventListener('change', updateEnrollmentSummary);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Trainees for Dropdowns
+        // ============================================
+        async function loadTrainees() {
+            try {
+                const result = await apiCall('/trainees');
+                traineesList = result.data || [];
+                
+                // Populate trainee dropdown in modal
+                const modalSelect = document.getElementById('enrollmentTrainee');
+                modalSelect.innerHTML = '<option value="">Select Trainee</option>' + 
+                    traineesList.map(t => `<option value="${t.trainee_id}">${t.first_name} ${t.last_name} (${t.trainee_code || ''})</option>`).join('');
+                
+            } catch (error) {
+                console.error('Failed to load trainees:', error);
+            }
+        }
+        
+        // ============================================
+        // Load Batches for Dropdowns
+        // ============================================
+        async function loadBatches() {
+            try {
+                const result = await apiCall('/batches');
+                batchesList = result.data || [];
+                
+                // Populate batch dropdown in modal
+                const modalSelect = document.getElementById('enrollmentBatch');
+                modalSelect.innerHTML = '<option value="">Select Batch</option>' + 
+                    batchesList.map(b => `<option value="${b.batch_id}">${b.batch_name} (${b.course_title || 'No Course'})</option>`).join('');
+                
+            } catch (error) {
+                console.error('Failed to load batches:', error);
+            }
+        }
+        
+        // ============================================
+        // Update Enrollment Summary
+        // ============================================
+        function updateEnrollmentSummary() {
+            const batchId = document.getElementById('enrollmentBatch').value;
+            const summary = document.getElementById('enrollmentSummary');
+            
+            if (!batchId) {
+                summary.style.display = 'none';
+                return;
+            }
+            
+            const batch = batchesList.find(b => b.batch_id == batchId);
+            if (!batch) {
+                summary.style.display = 'none';
+                return;
+            }
+            
+            selectedBatchData = batch;
+            
+            document.getElementById('summaryCourse').textContent = batch.course_title || 'N/A';
+            document.getElementById('summaryBatch').textContent = batch.batch_name || 'N/A';
+            document.getElementById('summaryFee').textContent = `ETB ${(batch.fee_amount || 0).toLocaleString()}`;
+            
+            const available = (batch.max_capacity || 0) - (batch.current_enrollment || 0);
+            document.getElementById('summarySeats').textContent = available;
+            
+            const today = new Date();
+            document.getElementById('summaryDate').textContent = today.toLocaleDateString();
+            
+            summary.style.display = 'block';
+        }
+        
+        // ============================================
+        // Load Enrollments
+        // ============================================
+        async function loadEnrollments(page = 1) {
+            showLoading();
+            currentPage = page;
+            
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            const payment = document.getElementById('paymentFilter').value;
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: perPage,
+                    search: search,
+                    status: status,
+                    payment_status: payment
+                });
+                
+                const result = await apiCall(`/enrollments?${params.toString()}`);
+                
+                enrollmentsData = result.data || [];
+                totalPages = result.total_pages || 1;
+                
+                renderTable(enrollmentsData);
+                renderPagination();
+                updateTableInfo(result.total || 0);
+                
+            } catch (error) {
+                showToast('Failed to load enrollments: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Render Table
+        // ============================================
+        function renderTable(enrollments) {
+            const tbody = document.getElementById('enrollmentsTableBody');
+            const count = document.getElementById('enrollmentCount');
+            
+            count.textContent = enrollments.length;
+            
+            if (!enrollments || enrollments.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fas fa-edit fa-2x d-block mb-2"></i>
+                            No enrollments found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = enrollments.map(enrollment => {
+                const progressPercent = enrollment.attendance_percentage || 0;
+                const statusClass = (enrollment.status || 'enrolled').toLowerCase();
+                const paymentClass = (enrollment.payment_status || 'pending').toLowerCase();
+                
+                return `
+                    <tr>
+                        <td><span class="enrollment-number">${enrollment.enrollment_number || '#'}</span></td>
+                        <td>
+                            <div class="fw-bold">${enrollment.trainee_name || 'N/A'}</div>
+                            <small class="text-muted">${enrollment.trainee_code || ''}</small>
+                        </td>
+                        <td>${enrollment.course_title || 'N/A'}</td>
+                        <td>${enrollment.batch_name || 'N/A'}</td>
+                        <td>
+                            <span class="payment-badge ${paymentClass}">
+                                ${enrollment.payment_status || 'Pending'}
+                            </span>
+                            <br>
+                            <small>ETB ${(enrollment.amount_paid || 0).toLocaleString()}</small>
+                        </td>
+                        <td>
+                            <div class="progress-wrapper">
+                                <div class="d-flex justify-content-between small">
+                                    <span>${progressPercent}%</span>
+                                    <span>${enrollment.grade || ''}</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-primary" style="width: ${progressPercent}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-${statusClass}">
+                                ${enrollment.status || 'Enrolled'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-info" onclick="viewEnrollment(${enrollment.enrollment_id})" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="editEnrollment(${enrollment.enrollment_id})" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="openDeleteModal(${enrollment.enrollment_id})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // Render Pagination
+        // ============================================
+        function renderPagination() {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `<ul class="pagination pagination-sm mb-0">`;
+            
+            html += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadEnrollments(${currentPage - 1})">«</a>
+                </li>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadEnrollments(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadEnrollments(${currentPage + 1})">»</a>
+                </li>
+            `;
+            
+            html += `</ul>`;
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // Update Table Info
+        // ============================================
+        function updateTableInfo(total) {
+            const start = (currentPage - 1) * perPage + 1;
+            const end = Math.min(start + perPage - 1, total);
+            document.getElementById('tableInfo').textContent = 
+                `Showing ${total > 0 ? start : 0} to ${end} of ${total} enrollments`;
+        }
+        
+        // ============================================
+        // Filter Functions
+        // ============================================
+        function filterEnrollments() {
+            loadEnrollments(1);
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('paymentFilter').value = '';
+            loadEnrollments(1);
+        }
+        
+        function refreshTable() {
+            loadEnrollments(currentPage);
+        }
+        
+        // ============================================
+        // Export Data
+        // ============================================
+        function exportDataExcel() {
+            const columns = [
+                { key: 'enrollment_number', label: 'Enrollment #' },
+                { key: 'trainee_name', label: 'Trainee' },
+                { key: 'course_title', label: 'Course' },
+                { key: 'batch_name', label: 'Batch' },
+                { key: 'enrollment_date', label: 'Enrollment Date' },
+                { key: 'status', label: 'Status' },
+                { key: 'payment_status', label: 'Payment Status' },
+                { key: 'final_amount', label: 'Amount' }
+            ];
+            exportArrayToExcel(enrollmentsData, columns, 'enrollments', 'Enrollments');
+        }
+
+        function exportDataPDF() {
+            const columns = [
+                { key: 'enrollment_number', label: 'Enrollment #' },
+                { key: 'trainee_name', label: 'Trainee' },
+                { key: 'course_title', label: 'Course' },
+                { key: 'batch_name', label: 'Batch' },
+                { key: 'enrollment_date', label: 'Enrollment Date' },
+                { key: 'status', label: 'Status' },
+                { key: 'payment_status', label: 'Payment Status' },
+                { key: 'final_amount', label: 'Amount' }
+            ];
+            exportArrayToPDF(enrollmentsData, columns, 'enrollments', 'Enrollments Report');
+        }
+        
+        // ============================================
+        // Open Add Enrollment Modal
+        // ============================================
+        function openAddEnrollmentModal() {
+            editEnrollmentId = null;
+            document.getElementById('editEnrollmentId').value = '';
+            document.getElementById('enrollmentForm').reset();
+            document.getElementById('paymentStatus').value = 'Pending';
+            document.getElementById('discountAmount').value = 0;
+            document.getElementById('enrollmentSummary').style.display = 'none';
+            selectedBatchData = null;
+            enrollmentModal.show();
+        }
+        
+        // ============================================
+        // Edit Enrollment
+        // ============================================
+        async function editEnrollment(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/enrollments/${id}`);
+                const enrollment = result.data;
+                
+                editEnrollmentId = id;
+                document.getElementById('editEnrollmentId').value = id;
+                
+                // Populate form
+                document.getElementById('enrollmentTrainee').value = enrollment.trainee_id || '';
+                document.getElementById('enrollmentBatch').value = enrollment.batch_id || '';
+                document.getElementById('paymentStatus').value = enrollment.payment_status || 'Pending';
+                document.getElementById('paymentAmount').value = enrollment.amount_paid || '';
+                document.getElementById('paymentMethod').value = enrollment.payment_method || '';
+                document.getElementById('discountAmount').value = enrollment.discount_amount || 0;
+                document.getElementById('enrollmentNotes').value = enrollment.notes || '';
+                
+                // Update summary
+                updateEnrollmentSummary();
+                
+                enrollmentModal.show();
+            } catch (error) {
+                showToast('Failed to load enrollment data: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Save Enrollment
+        // ============================================
+        async function saveEnrollment() {
+            const id = document.getElementById('editEnrollmentId').value;
+            const traineeId = document.getElementById('enrollmentTrainee').value;
+            const batchId = document.getElementById('enrollmentBatch').value;
+            
+            // Validate
+            if (!traineeId || !batchId) {
+                showToast('Please select a trainee and batch', 'warning');
+                return;
+            }
+            
+            const data = {
+                trainee_id: parseInt(traineeId),
+                batch_id: parseInt(batchId),
+                status: 'Active',
+                payment_status: document.getElementById('paymentStatus').value,
+                amount_paid: parseFloat(document.getElementById('paymentAmount').value) || 0,
+                payment_method: document.getElementById('paymentMethod').value || null,
+                discount_amount: parseFloat(document.getElementById('discountAmount').value) || 0,
+                notes: document.getElementById('enrollmentNotes').value.trim()
+            };
+            
+            try {
+                showLoading();
+                
+                if (id) {
+                    await apiCall(`/enrollments/${id}`, 'PUT', data);
+                    showToast('Enrollment updated successfully!', 'success');
+                } else {
+                    await apiCall('/enrollments', 'POST', data);
+                    showToast('Enrollment created successfully!', 'success');
+                }
+                
+                enrollmentModal.hide();
+                loadEnrollments(currentPage);
+                
+            } catch (error) {
+                showToast('Failed to save enrollment: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // View Enrollment
+        // ============================================
+        async function viewEnrollment(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/enrollments/${id}`);
+                const enrollment = result.data;
+                
+                const progressPercent = enrollment.attendance_percentage || 0;
+                
+                document.getElementById('viewEnrollmentBody').innerHTML = `
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5>Enrollment ${enrollment.enrollment_number}</h5>
+                                    <span class="badge badge-${(enrollment.status || 'enrolled').toLowerCase()}">${enrollment.status || 'Enrolled'}</span>
+                                    <span class="payment-badge ${(enrollment.payment_status || 'pending').toLowerCase()} ms-2">${enrollment.payment_status || 'Pending'}</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Trainee:</strong> ${enrollment.trainee_name || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Trainee Code:</strong> ${enrollment.trainee_code || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Course:</strong> ${enrollment.course_title || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Batch:</strong> ${enrollment.batch_name || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Enrollment Date:</strong> ${enrollment.enrollment_date || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Completion:</strong> ${progressPercent}%
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Grade:</strong> ${enrollment.grade || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Amount Paid:</strong> ETB ${(enrollment.amount_paid || 0).toLocaleString()}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Payment Status:</strong> ${enrollment.payment_status || 'Pending'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Payment Method:</strong> ${enrollment.payment_method || 'N/A'}
+                                </div>
+                                ${enrollment.notes ? `
+                                    <div class="col-12 mt-2">
+                                        <strong>Notes:</strong>
+                                        <p class="mt-1">${enrollment.notes}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                viewModal.show();
+            } catch (error) {
+                showToast('Failed to load enrollment details', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Delete Modal
+        // ============================================
+        function openDeleteModal(id) {
+            const enrollment = enrollmentsData.find(e => e.enrollment_id === id);
+            if (!enrollment) {
+                showToast('Enrollment not found', 'error');
+                return;
+            }
+            
+            deleteEnrollmentId = id;
+            document.getElementById('confirmBody').innerHTML = `
+                Are you sure you want to drop the enrollment for <strong>"${enrollment.trainee_name}"</strong> in <strong>"${enrollment.course_title}"</strong>?
+                Enrollments are never permanently deleted (attendance/results history must be kept) -
+                this will mark it as <strong>Dropped</strong> instead.
+            `;
+            confirmModal.show();
+        }
+        
+        // ============================================
+        // Confirm Delete (actually: drop - enrollments are never hard-deleted)
+        // ============================================
+        async function confirmDelete() {
+            if (!deleteEnrollmentId) return;
+            
+            try {
+                showLoading();
+                await apiCall(`/enrollments/${deleteEnrollmentId}/drop`, 'POST');
+                showToast('Enrollment dropped successfully!', 'success');
+                confirmModal.hide();
+                loadEnrollments(currentPage);
+            } catch (error) {
+                showToast('Failed to drop enrollment: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                deleteEnrollmentId = null;
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+            confirmModal.show();
+            
+            document.getElementById('confirmBtn').onclick = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            };
+        }
+        
+        console.log('📋 Enrollment Management page loaded successfully');
+        console.log('🔗 API Integration: api.js + enrollments-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

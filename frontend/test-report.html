@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STTIMS Test Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { padding: 2rem; font-family: 'Inter', sans-serif; }
+        .test-pass { color: #10B981; }
+        .test-fail { color: #EF4444; }
+        .test-pending { color: #F59E0B; }
+        .summary-card { background: #f8fafc; border-radius: 12px; padding: 1.5rem; text-align: center; }
+        .summary-card .number { font-size: 2.5rem; font-weight: 700; }
+        .summary-card .label { font-size: 0.85rem; color: #6B7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-4">
+            <h1><i class="fas fa-vial text-primary me-2"></i>STTIMS Test Report</h1>
+            <p class="text-muted">Generated on <span id="reportDate"></span></p>
+        </div>
+
+        <!-- Summary -->
+        <div class="row g-4 mb-4" id="summaryCards">
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <div class="number text-primary" id="totalTests">0</div>
+                    <div class="label">Total Tests</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <div class="number test-pass" id="passedTests">0</div>
+                    <div class="label">Passed</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <div class="number test-fail" id="failedTests">0</div>
+                    <div class="label">Failed</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card">
+                    <div class="number text-info" id="passRate">0%</div>
+                    <div class="label">Pass Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Results Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>Test Results</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Test ID</th>
+                                <th>Test Case</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="testResultsBody">
+                            <!-- Test results will be populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center text-muted small">
+            <i class="fas fa-check-circle text-success me-1"></i>Passed
+            <i class="fas fa-times-circle text-danger ms-3 me-1"></i>Failed
+            <i class="fas fa-clock text-warning ms-3 me-1"></i>Pending
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('reportDate').textContent = new Date().toLocaleString();
+
+        // Sample test data - replace with actual test results
+        const testResults = [
+            { id: 'NAV-01', name: 'Sidebar Navigation', category: 'Navigation', status: 'Pass', notes: '' },
+            { id: 'NAV-02', name: 'Brand Logo Click', category: 'Navigation', status: 'Pass', notes: '' },
+            { id: 'LOG-01', name: 'Valid Login', category: 'Authentication', status: 'Pass', notes: '' },
+            { id: 'LOG-02', name: 'Invalid Username', category: 'Authentication', status: 'Pass', notes: '' },
+            { id: 'TRN-01', name: 'List Trainees', category: 'Trainee', status: 'Pass', notes: '' },
+            { id: 'TRN-02', name: 'Add Trainee', category: 'Trainee', status: 'Fail', notes: 'Email validation error' },
+            { id: 'USR-01', name: 'List Users', category: 'User', status: 'Pass', notes: '' },
+            { id: 'USR-02', name: 'Add User', category: 'User', status: 'Pending', notes: 'Awaiting fix' },
+            { id: 'CRS-01', name: 'List Courses', category: 'Course', status: 'Pass', notes: '' },
+            { id: 'BCH-01', name: 'List Batches', category: 'Batch', status: 'Pass', notes: '' },
+            { id: 'ENR-01', name: 'List Enrollments', category: 'Enrollment', status: 'Pass', notes: '' },
+            { id: 'ATN-01', name: 'Load Trainees', category: 'Attendance', status: 'Pass', notes: '' },
+            { id: 'RPT-01', name: 'Load Report', category: 'Reports', status: 'Pass', notes: '' },
+            { id: 'SET-01', name: 'Save Institution', category: 'Settings', status: 'Pass', notes: '' },
+            { id: 'RES-01', name: 'Desktop View', category: 'Responsive', status: 'Pass', notes: '' },
+            { id: 'RES-05', name: 'Mobile Large', category: 'Responsive', status: 'Pass', notes: '' }
+        ];
+
+        // Populate table
+        const tbody = document.getElementById('testResultsBody');
+        let total = 0, passed = 0, failed = 0, pending = 0;
+
+        testResults.forEach(result => {
+            const statusClass = result.status === 'Pass' ? 'test-pass' : 
+                              result.status === 'Fail' ? 'test-fail' : 'test-pending';
+            const statusIcon = result.status === 'Pass' ? 'fa-check-circle' : 
+                              result.status === 'Fail' ? 'fa-times-circle' : 'fa-clock';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td><span class="badge bg-secondary">${result.id}</span></td>
+                    <td>${result.name}</td>
+                    <td>${result.category}</td>
+                    <td><span class="${statusClass}"><i class="fas ${statusIcon} me-1"></i>${result.status}</span></td>
+                    <td>${result.notes || '-'}</td>
+                </tr>
+            `;
+
+            total++;
+            if (result.status === 'Pass') passed++;
+            else if (result.status === 'Fail') failed++;
+            else pending++;
+        });
+
+        // Update summary
+        document.getElementById('totalTests').textContent = total;
+        document.getElementById('passedTests').textContent = passed;
+        document.getElementById('failedTests').textContent = failed;
+        document.getElementById('passRate').textContent = total > 0 ? `${(passed / total * 100).toFixed(1)}%` : '0%';
+    </script>
+</body>
+</html>

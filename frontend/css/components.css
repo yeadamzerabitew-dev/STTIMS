@@ -1,0 +1,72 @@
+/* ============================================
+   STTIMS - Reusable Components CSS
+   ============================================ */
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
+    border: none;
+    transition: all 0.3s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79,70,229,0.4); }
+
+.btn-success { background: linear-gradient(135deg, #10B981, #059669); border: none; }
+.btn-danger { background: linear-gradient(135deg, #EF4444, #DC2626); border: none; }
+.btn-sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+.btn-lg { padding: 0.5rem 1.5rem; font-size: 1.125rem; }
+
+/* Cards */
+.card { border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s; }
+.card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.card-header { background: transparent; border-bottom: 1px solid #e5e7eb; font-weight: 600; }
+.card-footer { background: transparent; border-top: 1px solid #e5e7eb; }
+
+/* Tables */
+.table thead th { font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; border-bottom: 2px solid #e5e7eb; }
+.table tbody tr:hover { background-color: rgba(79,70,229,0.04); }
+.table-actions { display: flex; gap: 0.25rem; }
+.table-actions .btn { padding: 0.2rem 0.5rem; font-size: 0.75rem; }
+
+/* Forms */
+.form-control, .form-select { border-radius: 8px; border: 1px solid #d1d5db; transition: all 0.2s; }
+.form-control:focus, .form-select:focus { border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+.form-label { font-weight: 500; font-size: 0.875rem; margin-bottom: 0.25rem; }
+.form-group { margin-bottom: 1rem; }
+
+/* Pagination */
+.pagination .page-link { border: none; padding: 0.5rem 1rem; color: #4F46E5; border-radius: 6px; margin: 0 2px; }
+.pagination .page-link:hover { background: rgba(79,70,229,0.08); color: #4338CA; }
+.pagination .page-item.active .page-link { background: #4F46E5; color: #fff; }
+
+/* Alerts */
+.alert { border: none; border-radius: 8px; padding: 0.75rem 1.25rem; }
+.alert-success { background: #D1FAE5; color: #065F46; }
+.alert-danger { background: #FEE2E2; color: #991B1B; }
+.alert-warning { background: #FEF3C7; color: #92400E; }
+.alert-info { background: #DBEAFE; color: #1E40AF; }
+
+/* Badges */
+.badge { padding: 0.35rem 0.75rem; font-weight: 500; border-radius: 50px; }
+.badge-active { background: #D1FAE5; color: #065F46; }
+.badge-inactive { background: #FEE2E2; color: #991B1B; }
+.badge-pending { background: #FEF3C7; color: #92400E; }
+.badge-completed { background: #DBEAFE; color: #1E40AF; }
+
+/* Loading */
+.loading-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.spinner-border { width: 3rem; height: 3rem; }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 3rem 1rem; }
+.empty-state .empty-icon { font-size: 4rem; color: #D1D5DB; margin-bottom: 1rem; }
+.empty-state h5 { color: #1F2937; margin-bottom: 0.5rem; }
+.empty-state p { color: #6B7280; max-width: 400px; margin: 0 auto 1.5rem; }

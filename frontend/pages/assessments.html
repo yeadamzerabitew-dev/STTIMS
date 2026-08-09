@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Management - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Assessment Specific Styles */
+        .assessment-code {
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #4F46E5;
+            background: rgba(79, 70, 229, 0.08);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .assessment-type-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        .assessment-type-badge.quiz { background: #DBEAFE; color: #1E40AF; }
+        .assessment-type-badge.assignment { background: #D1FAE5; color: #065F46; }
+        .assessment-type-badge.lab { background: #FEF3C7; color: #92400E; }
+        .assessment-type-badge.project { background: #EDE9FE; color: #5B21B6; }
+        .assessment-type-badge.exam { background: #FEE2E2; color: #991B1B; }
+        .assessment-type-badge.practical { background: #FCE4EC; color: #880E4F; }
+        .assessment-type-badge.presentation { background: #E0E7FF; color: #3730A3; }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .table-container .table {
+            min-width: 1000px;
+        }
+        
+        /* Form Styles */
+        .form-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4F46E5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .form-section {
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .weightage-display {
+            font-size: 0.9rem;
+            color: #6B7280;
+        }
+        
+        .weightage-display .total {
+            font-weight: 600;
+        }
+        
+        .weightage-display .total.exceeded {
+            color: #EF4444;
+        }
+        
+        .weightage-display .total.within {
+            color: #10B981;
+        }
+        
+        /* Status Badges */
+        .badge-scheduled { background: #DBEAFE; color: #1E40AF; }
+        .badge-ongoing { background: #FEF3C7; color: #92400E; }
+        .badge-completed { background: #D1FAE5; color: #065F46; }
+        .badge-cancelled { background: #FEE2E2; color: #991B1B; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Assessment Management</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-tasks me-2 text-primary"></i>Assessment Management
+                    </h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="openAddAssessmentModal()">
+                            <i class="fas fa-plus-circle me-1"></i>Create Assessment
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput" 
+                                       placeholder="Search by title or code..." oninput="filterAssessments()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Type</label>
+                            <select class="form-select" id="typeFilter" onchange="filterAssessments()">
+                                <option value="">All Types</option>
+                                <option value="Quiz">Quiz</option>
+                                <option value="Assignment">Assignment</option>
+                                <option value="Lab">Lab</option>
+                                <option value="Practical">Practical</option>
+                                <option value="Project">Project</option>
+                                <option value="Exam">Exam</option>
+                                <option value="Presentation">Presentation</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterAssessments()">
+                                <option value="">All Status</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-outline-secondary btn-sm me-1" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-export me-1"></i>Export
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataExcel(); return false;"><i class="fas fa-file-excel me-2 text-success"></i>Export to Excel</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataPDF(); return false;"><i class="fas fa-file-pdf me-2 text-danger"></i>Export to PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assessments Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Assessments
+                            <span class="badge bg-primary ms-2" id="assessmentCount">0</span>
+                        </h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadAssessments()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table table-striped table-hover mb-0" id="assessmentsTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Marks</th>
+                                        <th>Weight</th>
+                                        <th>Date</th>
+                                        <th>Duration</th>
+                                        <th>Status</th>
+                                        <th style="width: 120px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="assessmentsTableBody">
+                                    <!-- Assessments loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="text-muted small" id="tableInfo">Showing 0 of 0 assessments</span>
+                        <nav id="paginationContainer"></nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- Add/Edit Assessment Modal -->
+    <div class="modal fade" id="addAssessmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2 text-primary"></i>
+                        <span id="assessmentModalTitle">Create New Assessment</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assessmentForm" novalidate>
+                        <input type="hidden" id="editAssessmentId">
+                        
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Assessment Title <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="assessmentTitle" required>
+                                        <div class="invalid-feedback">Title is required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Assessment Type <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="assessmentType" required>
+                                            <option value="">Select Type</option>
+                                            <option value="Quiz">Quiz</option>
+                                            <option value="Assignment">Assignment</option>
+                                            <option value="Lab">Lab</option>
+                                            <option value="Practical">Practical</option>
+                                            <option value="Project">Project</option>
+                                            <option value="Exam">Exam</option>
+                                            <option value="Presentation">Presentation</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a type</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Batch <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="assessmentBatch" required>
+                                            <option value="">Select Batch</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a batch</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select" id="assessmentStatus">
+                                            <option value="Scheduled">Scheduled</option>
+                                            <option value="Ongoing">Ongoing</option>
+                                            <option value="Completed">Completed</option>
+                                            <option value="Cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Marks & Weightage -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-percentage me-2"></i>Marks & Weightage</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Max Marks <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="maxMarks" min="1" required>
+                                        <div class="invalid-feedback">Max marks is required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Weightage (%) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="weightage" min="1" max="100" required>
+                                        <div class="invalid-feedback">Weightage is required (1-100)</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Passing Marks</label>
+                                        <input type="number" class="form-control" id="passingMarks" min="0">
+                                        <div class="form-text">Leave empty for 50% of max marks</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="weightage-display mt-2">
+                                <span>Total weightage for this batch: </span>
+                                <span class="total" id="totalWeightage">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Schedule -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-calendar-alt me-2"></i>Schedule</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Assessment Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="assessmentDate" required>
+                                        <div class="invalid-feedback">Date is required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Start Time</label>
+                                        <input type="time" class="form-control" id="startTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Duration (minutes)</label>
+                                        <input type="number" class="form-control" id="duration" min="1" placeholder="e.g., 60">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Total Questions</label>
+                                        <input type="number" class="form-control" id="totalQuestions" min="0">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">End Time</label>
+                                        <input type="time" class="form-control" id="endTime">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-align-left me-2"></i>Description & Instructions</h6>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" id="assessmentDescription" rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Instructions</label>
+                                <textarea class="form-control" id="assessmentInstructions" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-group">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="assessmentNotes" rows="1"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" id="saveAssessmentBtn">
+                        <i class="fas fa-save me-1"></i>Create Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Assessment Modal -->
+    <div class="modal fade" id="viewAssessmentModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-tasks me-2 text-primary"></i>Assessment Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewAssessmentBody">
+                    <!-- Assessment details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+
+    <!-- Export libraries (Excel + PDF) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="../js/export-utils.js"></script>
+    <script src="../js/assessments-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let currentPage = 1;
+        let totalPages = 1;
+        let perPage = 10;
+        let assessmentsData = [];
+        let deleteAssessmentId = null;
+        let editAssessmentId = null;
+        let batchesList = [];
+        let allAssessments = [];
+        
+        const assessmentModal = new bootstrap.Modal(document.getElementById('addAssessmentModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewAssessmentModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load batches for dropdowns
+            loadBatches();
+            
+            // Load assessments
+            loadAssessments();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Save assessment button
+            document.getElementById('saveAssessmentBtn').addEventListener('click', saveAssessment);
+            
+            // Confirm button
+            document.getElementById('confirmBtn').addEventListener('click', confirmDelete);
+            
+            // Batch selection change - update weightage
+            document.getElementById('assessmentBatch').addEventListener('change', updateTotalWeightage);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Batches for Dropdowns
+        // ============================================
+        async function loadBatches() {
+            try {
+                const result = await apiCall('/batches');
+                batchesList = result.data || [];
+                
+                // Populate batch dropdown in modal
+                const modalSelect = document.getElementById('assessmentBatch');
+                modalSelect.innerHTML = '<option value="">Select Batch</option>' + 
+                    batchesList.map(b => `<option value="${b.batch_id}">${b.batch_name} (${b.course_title || 'No Course'})</option>`).join('');
+                
+            } catch (error) {
+                console.error('Failed to load batches:', error);
+            }
+        }
+        
+        // ============================================
+        // Update Total Weightage
+        // ============================================
+        function updateTotalWeightage() {
+            const batchId = document.getElementById('assessmentBatch').value;
+            const display = document.getElementById('totalWeightage');
+            
+            if (!batchId) {
+                display.textContent = '0%';
+                display.className = 'total';
+                return;
+            }
+            
+            // Get all assessments for this batch
+            const batchAssessments = allAssessments.filter(a => a.batch_id == batchId);
+            const currentWeight = parseFloat(document.getElementById('weightage').value) || 0;
+            
+            // Sum existing weightages
+            let total = 0;
+            batchAssessments.forEach(a => {
+                if (a.assessment_id != editAssessmentId) {
+                    total += parseFloat(a.weightage_percent) || 0;
+                }
+            });
+            
+            // Add current weight (if editing, subtract old value)
+            total += currentWeight;
+            
+            display.textContent = total + '%';
+            
+            if (total > 100) {
+                display.className = 'total exceeded';
+                document.getElementById('saveAssessmentBtn').disabled = true;
+                document.getElementById('weightage').classList.add('is-invalid');
+                document.getElementById('weightage').nextElementSibling.textContent = 'Total weightage exceeds 100%';
+            } else {
+                display.className = 'total within';
+                document.getElementById('saveAssessmentBtn').disabled = false;
+                document.getElementById('weightage').classList.remove('is-invalid');
+            }
+        }
+        
+        // ============================================
+        // Load Assessments
+        // ============================================
+        async function loadAssessments(page = 1) {
+            showLoading();
+            currentPage = page;
+            
+            const search = document.getElementById('searchInput').value;
+            const type = document.getElementById('typeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: perPage,
+                    search: search,
+                    assessment_type: type,
+                    status: status
+                });
+                
+                const result = await apiCall(`/assessments?${params.toString()}`);
+                
+                assessmentsData = result.data || [];
+                allAssessments = result.all || [];
+                totalPages = result.total_pages || 1;
+                
+                renderTable(assessmentsData);
+                renderPagination();
+                updateTableInfo(result.total || 0);
+                
+            } catch (error) {
+                showToast('Failed to load assessments: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Render Table
+        // ============================================
+        function renderTable(assessments) {
+            const tbody = document.getElementById('assessmentsTableBody');
+            const count = document.getElementById('assessmentCount');
+            
+            count.textContent = assessments.length;
+            
+            if (!assessments || assessments.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            <i class="fas fa-tasks fa-2x d-block mb-2"></i>
+                            No assessments found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = assessments.map(assessment => {
+                const statusClass = (assessment.status || 'scheduled').toLowerCase();
+                const typeClass = (assessment.assessment_type || 'quiz').toLowerCase();
+                const passingText = assessment.passing_marks ? `Pass: ${assessment.passing_marks}` : '50%';
+                
+                return `
+                    <tr>
+                        <td><span class="assessment-code">${assessment.assessment_code || '-'}</span></td>
+                        <td>
+                            <div class="fw-bold">${assessment.title || 'Untitled'}</div>
+                            <small class="text-muted">${assessment.batch_name || ''}</small>
+                        </td>
+                        <td>
+                            <span class="assessment-type-badge ${typeClass}">
+                                ${assessment.assessment_type || 'Quiz'}
+                            </span>
+                        </td>
+                        <td>${assessment.max_marks || 0}</td>
+                        <td>${assessment.weightage_percent || 0}%</td>
+                        <td>${assessment.assessment_date || 'N/A'}</td>
+                        <td>${assessment.duration_minutes ? assessment.duration_minutes + ' min' : '-'}</td>
+                        <td>
+                            <span class="badge badge-${statusClass}">
+                                ${assessment.status || 'Scheduled'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-info" onclick="viewAssessment(${assessment.assessment_id})" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="editAssessment(${assessment.assessment_id})" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="openDeleteModal(${assessment.assessment_id})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // Render Pagination
+        // ============================================
+        function renderPagination() {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `<ul class="pagination pagination-sm mb-0">`;
+            
+            html += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadAssessments(${currentPage - 1})">«</a>
+                </li>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadAssessments(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadAssessments(${currentPage + 1})">»</a>
+                </li>
+            `;
+            
+            html += `</ul>`;
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // Update Table Info
+        // ============================================
+        function updateTableInfo(total) {
+            const start = (currentPage - 1) * perPage + 1;
+            const end = Math.min(start + perPage - 1, total);
+            document.getElementById('tableInfo').textContent = 
+                `Showing ${total > 0 ? start : 0} to ${end} of ${total} assessments`;
+        }
+        
+        // ============================================
+        // Filter Functions
+        // ============================================
+        function filterAssessments() {
+            loadAssessments(1);
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            loadAssessments(1);
+        }
+        
+        function refreshTable() {
+            loadAssessments(currentPage);
+        }
+        
+        // ============================================
+        // Export Data
+        // ============================================
+        function exportDataExcel() {
+            const columns = [
+                { key: 'assessment_code', label: 'Code' },
+                { key: 'title', label: 'Title' },
+                { key: 'course_title', label: 'Course' },
+                { key: 'batch_name', label: 'Batch' },
+                { key: 'assessment_type', label: 'Type' },
+                { key: 'max_marks', label: 'Max Marks' },
+                { key: 'weightage_percent', label: 'Weightage %' },
+                { key: 'assessment_date', label: 'Date' },
+                { key: 'status', label: 'Status' }
+            ];
+            exportArrayToExcel(assessmentsData, columns, 'assessments', 'Assessments');
+        }
+
+        function exportDataPDF() {
+            const columns = [
+                { key: 'assessment_code', label: 'Code' },
+                { key: 'title', label: 'Title' },
+                { key: 'course_title', label: 'Course' },
+                { key: 'batch_name', label: 'Batch' },
+                { key: 'assessment_type', label: 'Type' },
+                { key: 'max_marks', label: 'Max Marks' },
+                { key: 'weightage_percent', label: 'Weightage %' },
+                { key: 'assessment_date', label: 'Date' },
+                { key: 'status', label: 'Status' }
+            ];
+            exportArrayToPDF(assessmentsData, columns, 'assessments', 'Assessments Report');
+        }
+        
+        // ============================================
+        // Open Add Assessment Modal
+        // ============================================
+        function openAddAssessmentModal() {
+            editAssessmentId = null;
+            document.getElementById('assessmentModalTitle').textContent = 'Create New Assessment';
+            document.getElementById('editAssessmentId').value = '';
+            document.getElementById('assessmentForm').reset();
+            document.getElementById('assessmentStatus').value = 'Scheduled';
+            document.getElementById('saveAssessmentBtn').disabled = false;
+            document.getElementById('totalWeightage').textContent = '0%';
+            document.getElementById('totalWeightage').className = 'total';
+            assessmentModal.show();
+        }
+        
+        // ============================================
+        // Edit Assessment
+        // ============================================
+        async function editAssessment(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/assessments/${id}`);
+                const assessment = result.data;
+                
+                editAssessmentId = id;
+                document.getElementById('assessmentModalTitle').textContent = 'Edit Assessment';
+                document.getElementById('editAssessmentId').value = id;
+                
+                // Populate form
+                document.getElementById('assessmentTitle').value = assessment.title || '';
+                document.getElementById('assessmentType').value = assessment.assessment_type || '';
+                document.getElementById('assessmentBatch').value = assessment.batch_id || '';
+                document.getElementById('assessmentStatus').value = assessment.status || 'Scheduled';
+                
+                document.getElementById('maxMarks').value = assessment.max_marks || '';
+                document.getElementById('weightage').value = assessment.weightage_percent || '';
+                document.getElementById('passingMarks').value = assessment.passing_marks || '';
+                
+                document.getElementById('assessmentDate').value = assessment.assessment_date || '';
+                document.getElementById('startTime').value = assessment.start_time || '';
+                document.getElementById('endTime').value = assessment.end_time || '';
+                document.getElementById('duration').value = assessment.duration_minutes || '';
+                document.getElementById('totalQuestions').value = assessment.total_questions || '';
+                
+                document.getElementById('assessmentDescription').value = assessment.description || '';
+                document.getElementById('assessmentInstructions').value = assessment.instructions || '';
+                document.getElementById('assessmentNotes').value = assessment.notes || '';
+                
+                // Update weightage
+                updateTotalWeightage();
+                
+                assessmentModal.show();
+            } catch (error) {
+                showToast('Failed to load assessment data: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Save Assessment
+        // ============================================
+        async function saveAssessment() {
+            const id = document.getElementById('editAssessmentId').value;
+            
+            const data = {
+                title: document.getElementById('assessmentTitle').value.trim(),
+                assessment_type: document.getElementById('assessmentType').value,
+                batch_id: parseInt(document.getElementById('assessmentBatch').value),
+                status: document.getElementById('assessmentStatus').value,
+                max_marks: parseFloat(document.getElementById('maxMarks').value) || 0,
+                weightage_percent: parseFloat(document.getElementById('weightage').value) || 0,
+                passing_marks: parseFloat(document.getElementById('passingMarks').value) || null,
+                assessment_date: document.getElementById('assessmentDate').value,
+                start_time: document.getElementById('startTime').value || null,
+                end_time: document.getElementById('endTime').value || null,
+                duration_minutes: parseInt(document.getElementById('duration').value) || null,
+                total_questions: parseInt(document.getElementById('totalQuestions').value) || null,
+                description: document.getElementById('assessmentDescription').value.trim(),
+                instructions: document.getElementById('assessmentInstructions').value.trim(),
+                notes: document.getElementById('assessmentNotes').value.trim()
+            };
+            
+            // Validate
+            if (!data.title || !data.assessment_type || !data.batch_id) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+            
+            if (!data.max_marks || data.max_marks <= 0) {
+                showToast('Max marks must be greater than 0', 'warning');
+                return;
+            }
+            
+            if (!data.weightage_percent || data.weightage_percent <= 0 || data.weightage_percent > 100) {
+                showToast('Weightage must be between 1 and 100', 'warning');
+                return;
+            }
+            
+            if (!data.assessment_date) {
+                showToast('Assessment date is required', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                if (id) {
+                    await apiCall(`/assessments/${id}`, 'PUT', data);
+                    showToast('Assessment updated successfully!', 'success');
+                } else {
+                    await apiCall('/assessments', 'POST', data);
+                    showToast('Assessment created successfully!', 'success');
+                }
+                
+                assessmentModal.hide();
+                loadAssessments(currentPage);
+                
+            } catch (error) {
+                showToast('Failed to save assessment: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // View Assessment
+        // ============================================
+        async function viewAssessment(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/assessments/${id}`);
+                const assessment = result.data;
+                
+                document.getElementById('viewAssessmentBody').innerHTML = `
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5>${assessment.title}</h5>
+                                    <span class="assessment-code">${assessment.assessment_code}</span>
+                                    <span class="assessment-type-badge ${(assessment.assessment_type || 'quiz').toLowerCase()} ms-2">${assessment.assessment_type || 'Quiz'}</span>
+                                    <span class="badge badge-${(assessment.status || 'scheduled').toLowerCase()}">${assessment.status || 'Scheduled'}</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Batch:</strong> ${assessment.batch_name || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Course:</strong> ${assessment.course_title || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Max Marks:</strong> ${assessment.max_marks || 0}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Weightage:</strong> ${assessment.weightage_percent || 0}%
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Passing Marks:</strong> ${assessment.passing_marks || '50% of max'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Date:</strong> ${assessment.assessment_date || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Time:</strong> ${assessment.start_time || 'N/A'} - ${assessment.end_time || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Duration:</strong> ${assessment.duration_minutes ? assessment.duration_minutes + ' minutes' : 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Total Questions:</strong> ${assessment.total_questions || 'N/A'}
+                                </div>
+                                ${assessment.description ? `
+                                    <div class="col-12 mt-2">
+                                        <strong>Description:</strong>
+                                        <p class="mt-1">${assessment.description}</p>
+                                    </div>
+                                ` : ''}
+                                ${assessment.instructions ? `
+                                    <div class="col-12 mt-2">
+                                        <strong>Instructions:</strong>
+                                        <p class="mt-1">${assessment.instructions}</p>
+                                    </div>
+                                ` : ''}
+                                ${assessment.notes ? `
+                                    <div class="col-12 mt-2">
+                                        <strong>Notes:</strong>
+                                        <p class="mt-1">${assessment.notes}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                viewModal.show();
+            } catch (error) {
+                showToast('Failed to load assessment details', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Delete Modal
+        // ============================================
+        function openDeleteModal(id) {
+            const assessment = assessmentsData.find(a => a.assessment_id === id);
+            if (!assessment) {
+                showToast('Assessment not found', 'error');
+                return;
+            }
+            
+            deleteAssessmentId = id;
+            document.getElementById('confirmBody').innerHTML = `
+                Are you sure you want to cancel assessment <strong>"${assessment.title}"</strong>?
+                Assessments are never permanently deleted (recorded results must be kept) -
+                this will mark it as <strong>Cancelled</strong> instead.
+            `;
+            confirmModal.show();
+        }
+        
+        // ============================================
+        // Confirm Delete (actually: cancel - assessments are never hard-deleted)
+        // ============================================
+        async function confirmDelete() {
+            if (!deleteAssessmentId) return;
+            
+            try {
+                showLoading();
+                await apiCall(`/assessments/${deleteAssessmentId}/cancel`, 'POST');
+                showToast('Assessment cancelled successfully!', 'success');
+                confirmModal.hide();
+                loadAssessments(currentPage);
+            } catch (error) {
+                showToast('Failed to cancel assessment: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                deleteAssessmentId = null;
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+            confirmModal.show();
+            
+            document.getElementById('confirmBtn').onclick = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            };
+        }
+        
+        console.log('📝 Assessment Management page loaded successfully');
+        console.log('🔗 API Integration: api.js + assessments-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

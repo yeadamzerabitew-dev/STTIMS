@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STTIMS - Short-Term Training Institution Management System</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <style>
+        /* Index Page Specific Styles */
+        .hero-section {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #6D28D9 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 60%),
+                        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.03) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            color: #fff;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .hero-content .hero-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            width: 120px;
+            height: 120px;
+            line-height: 120px;
+            border-radius: 50%;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+        
+        .hero-content .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        
+        .hero-content .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .hero-content .btn-hero {
+            padding: 0.75rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        
+        .hero-content .btn-hero-primary {
+            background: #fff;
+            color: #4F46E5;
+            border: none;
+        }
+        
+        .hero-content .btn-hero-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        
+        .hero-content .btn-hero-outline {
+            background: transparent;
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        
+        .hero-content .btn-hero-outline:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #fff;
+            transform: translateY(-2px);
+        }
+        
+        .features-section {
+            padding: 4rem 0;
+            background: #f8fafc;
+        }
+        
+        .features-section .feature-card {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .features-section .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        .features-section .feature-card .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .features-section .feature-card .feature-icon.blue { background: rgba(79,70,229,0.1); color: #4F46E5; }
+        .features-section .feature-card .feature-icon.green { background: rgba(16,185,129,0.1); color: #10B981; }
+        .features-section .feature-card .feature-icon.orange { background: rgba(245,158,11,0.1); color: #F59E0B; }
+        .features-section .feature-card .feature-icon.purple { background: rgba(124,58,237,0.1); color: #7C3AED; }
+        .features-section .feature-card .feature-icon.pink { background: rgba(236,72,153,0.1); color: #EC4899; }
+        .features-section .feature-card .feature-icon.teal { background: rgba(20,184,166,0.1); color: #14B8A6; }
+        
+        .features-section .feature-card h5 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .features-section .feature-card p {
+            color: #6B7280;
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+        
+        .stats-section {
+            padding: 4rem 0;
+            background: #fff;
+        }
+        
+        .stats-section .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .stats-section .stat-item .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #4F46E5;
+        }
+        
+        .stats-section .stat-item .stat-label {
+            color: #6B7280;
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+        
+        .cta-section {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            color: #fff;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .cta-section p {
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .footer-section {
+            background: #1F2937;
+            color: #9CA3AF;
+            padding: 2rem 0;
+        }
+        
+        .footer-section .footer-links a {
+            color: #9CA3AF;
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: color 0.3s;
+        }
+        
+        .footer-section .footer-links a:hover {
+            color: #fff;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-content .hero-icon {
+                width: 80px;
+                height: 80px;
+                line-height: 80px;
+                font-size: 3rem;
+            }
+            
+            .hero-content .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-content .btn-hero {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .stats-section .stat-item .stat-number {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-content .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .features-section {
+                padding: 2rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================ -->
+    <!-- NAVBAR                                        -->
+    <!-- ============================================ -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <button class="btn btn-link text-white" id="sidebarToggle">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-graduation-cap me-2"></i>STTIMS
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <form class="d-none d-md-flex me-3" role="search">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm bg-light border-0" type="search" 
+                               placeholder="Search..." aria-label="Search">
+                        <button class="btn btn-light btn-sm" type="submit">
+                            <i class="fas fa-search text-secondary"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="dropdown me-3">
+                    <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            5
+                            <span class="visually-hidden">unread notifications</span>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end" style="width: 350px;">
+                        <div class="dropdown-header d-flex justify-content-between align-items-center">
+                            <span>Notifications</span>
+                            <a href="#" class="text-primary text-decoration-none small">Mark all as read</a>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item notification-item">
+                            <div class="d-flex align-items-start">
+                                <div class="notification-icon bg-success me-2">
+                                    <i class="fas fa-user-plus text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 small">New trainee registered</p>
+                                    <small class="text-muted">2 minutes ago</small>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item notification-item">
+                            <div class="d-flex align-items-start">
+                                <div class="notification-icon bg-warning me-2">
+                                    <i class="fas fa-exclamation-triangle text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-0 small">Batch capacity reaching limit</p>
+                                    <small class="text-muted">15 minutes ago</small>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item text-center text-primary">View all notifications</a>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                        <img src="https://ui-avatars.com/api/?name=Guest&background=4F46E5&color=fff&size=32" 
+                             alt="Profile" class="rounded-circle" width="32" height="32">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="pages/login.html"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                        <li><a class="dropdown-item" href="pages/dashboard.html"><i class="fas fa-home me-2"></i>Dashboard</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="pages/settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================ -->
+    <!-- SIDEBAR                                        -->
+    <!-- ============================================ -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h5 class="text-white text-center">
+                <i class="fas fa-graduation-cap me-2"></i>
+                STTIMS
+            </h5>
+            <button class="btn btn-link text-white sidebar-close" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="pages/dashboard.html">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/users.html">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/trainees.html">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Trainees</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/instructors.html">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Instructors</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/categories.html">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/courses.html">
+                    <i class="fas fa-book"></i>
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/batches.html">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Batches</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/enrollments.html">
+                    <i class="fas fa-edit"></i>
+                    <span>Enrollments</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/attendance.html">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Attendance</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/sessions.html">
+                    <i class="fas fa-clock"></i>
+                    <span>Sessions</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/assessments.html">
+                    <i class="fas fa-tasks"></i>
+                    <span>Assessments</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/results.html">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Results</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/certificates.html">
+                    <i class="fas fa-certificate"></i>
+                    <span>Certificates</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/reports.html">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="pages/settings.html">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <small class="text-muted">STTIMS v1.0.0</small>
+        </div>
+    </nav>
+
+    <!-- ============================================ -->
+    <!-- MAIN CONTENT                                  -->
+    <!-- ============================================ -->
+    <div class="main-content" id="mainContent">
+        
+        <!-- ========================================== -->
+        <!-- HERO SECTION                               -->
+        <!-- ========================================== -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="hero-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>STTIMS</h1>
+                <p class="hero-subtitle">
+                    Short-Term Training Institution Management System
+                    <br>
+                    <small>Streamline your training center operations with our comprehensive management solution</small>
+                </p>
+                <div class="hero-buttons">
+                    <a href="pages/login.html" class="btn btn-hero btn-hero-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="pages/dashboard.html" class="btn btn-hero btn-hero-outline">
+                        <i class="fas fa-th-large me-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- FEATURES SECTION                           -->
+        <!-- ========================================== -->
+        <section class="features-section">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold">Complete Training Management</h2>
+                    <p class="text-muted">Everything you need to manage your training institution efficiently</p>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-4 col-lg-4">
+                        <div class="feature-card">
+                            <div class="feature-icon blue">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <h5>Trainee Management</h5>
+                            <p>Manage trainee profiles, enrollments, attendance, and progress tracking</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                        <div class="feature-card">
+                            <div class="feature-icon green">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <h5>Instructor Management</h5>
+                            <p>Manage instructors, their qualifications, specializations, and assignments</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                        <div class="feature-card">
+                            <div class="feature-icon orange">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h5>Course & Batch Management</h5>
+                            <p>Create and manage courses, batches, schedules, and capacities</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                        <div class="feature-card">
+                            <div class="feature-icon purple">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <h5>Enrollment Management</h5>
+                            <p>Handle trainee enrollments, payments, and enrollment status tracking</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                        <div class="feature-card">
+                            <div class="feature-icon pink">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <h5>Assessment & Results</h5>
+                            <p>Create assessments, record results, and track trainee performance</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                        <div class="feature-card">
+                            <div class="feature-icon teal">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <h5>Certificate Management</h5>
+                            <p>Generate, preview, and issue certificates with verification tokens</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- STATS SECTION                             -->
+        <!-- ========================================== -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6 col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number" id="statTrainees">0</div>
+                            <div class="stat-label">Trainees</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number" id="statInstructors">0</div>
+                            <div class="stat-label">Instructors</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number" id="statCourses">0</div>
+                            <div class="stat-label">Courses</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number" id="statCertificates">0</div>
+                            <div class="stat-label">Certificates</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- CTA SECTION                               -->
+        <!-- ========================================== -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Ready to Get Started?</h2>
+                <p>Login to access the full system and start managing your training institution</p>
+                <a href="pages/login.html" class="btn btn-light btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login Now
+                </a>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- FOOTER                                     -->
+        <!-- ========================================== -->
+        <footer class="footer-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="footer-links">
+                            <a href="#">Privacy Policy</a>
+                            <a href="#">Terms of Service</a>
+                            <a href="#">Support</a>
+                            <a href="#">Contact</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col text-center">
+                        <small class="text-muted">Version 1.0.0 | Built with <i class="fas fa-heart text-danger"></i> for training institutions</small>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SCRIPTS                                       -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap 5 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="js/api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // FETCH REAL STATS FROM API
+        // ============================================
+        async function loadStats() {
+            try {
+                // Get total trainees
+                const traineesResult = await apiCall('/trainees?page=1&per_page=1');
+                const totalTrainees = traineesResult.total || 0;
+                
+                // Get total instructors
+                const instructorsResult = await apiCall('/instructors?page=1&per_page=1');
+                const totalInstructors = instructorsResult.total || 0;
+                
+                // Get total courses
+                const coursesResult = await apiCall('/courses?page=1&per_page=1');
+                const totalCourses = coursesResult.total || 0;
+                
+                // Get total certificates
+                const certificatesResult = await apiCall('/certificates?page=1&per_page=1');
+                const totalCertificates = certificatesResult.total || 0;
+                
+                // Update stats
+                const stats = {
+                    trainees: totalTrainees,
+                    instructors: totalInstructors,
+                    courses: totalCourses,
+                    certificates: totalCertificates
+                };
+                
+                // Animate numbers
+                animateStats(stats);
+                
+            } catch (error) {
+                console.warn('Failed to load stats from API, using fallback:', error.message);
+                // Fallback stats
+                const fallbackStats = {
+                    trainees: 0,
+                    instructors: 0,
+                    courses: 0,
+                    certificates: 0
+                };
+                animateStats(fallbackStats);
+            }
+        }
+        
+        // ============================================
+        // ANIMATE STAT NUMBERS
+        // ============================================
+        function animateStats(stats) {
+            const elements = {
+                'statTrainees': stats.trainees,
+                'statInstructors': stats.instructors,
+                'statCourses': stats.courses,
+                'statCertificates': stats.certificates
+            };
+            
+            Object.keys(elements).forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                
+                const target = elements[id];
+                const duration = 1000;
+                const startTime = performance.now();
+                
+                function update(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const current = Math.floor(target * eased);
+                    
+                    el.textContent = current.toLocaleString();
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        el.textContent = target.toLocaleString();
+                    }
+                }
+                
+                requestAnimationFrame(update);
+            });
+        }
+        
+        // ============================================
+        // INTERSECTION OBSERVER FOR STATS
+        // ============================================
+        function setupStatsObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadStats();
+                        observer.disconnect();
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            const statsSection = document.querySelector('.stats-section');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+        }
+        
+        // ============================================
+        // SIDEBAR TOGGLE
+        // ============================================
+        function setupSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const closeBtn = document.getElementById('sidebarClose');
+            
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    sidebar.classList.remove('show');
+                });
+            }
+            
+            // Close sidebar on outside click
+            document.addEventListener('click', function(e) {
+                if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
+        
+        // ============================================
+        // TOAST NOTIFICATION
+        // ============================================
+        function showToast(message, type = 'success') {
+            // Create toast container if it doesn't exist
+            let container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                container.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    max-width: 350px;
+                `;
+                document.body.appendChild(container);
+            }
+            
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            const toast = document.createElement('div');
+            toast.className = `alert ${alertClass} alert-dismissible fade show`;
+            toast.role = 'alert';
+            toast.innerHTML = `
+                <i class="fas ${icons[type] || icons.info} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+        
+        // ============================================
+        // INITIALIZE PAGE
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSidebar();
+            setupStatsObserver();
+            
+            console.log('🏠 STTIMS Homepage loaded successfully');
+            console.log('🔗 API Integration: api.js loaded');
+        });
+    </script>
+    
+</body>
+</html>

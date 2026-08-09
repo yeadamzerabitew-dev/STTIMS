@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Dashboard Specific Styles */
+        .stat-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card .stat-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+        
+        .stat-card .stat-trend {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .stat-card .stat-trend.up {
+            color: #10B981;
+        }
+        
+        .stat-card .stat-trend.down {
+            color: #EF4444;
+        }
+        
+        /* Activity Feed */
+        .activity-item {
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+        
+        .activity-item:hover {
+            background-color: #f8fafc;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon.bg-primary-light {
+            background: rgba(79, 70, 229, 0.1);
+            color: #4F46E5;
+        }
+        
+        .activity-icon.bg-success-light {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10B981;
+        }
+        
+        .activity-icon.bg-warning-light {
+            background: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+        }
+        
+        .activity-icon.bg-danger-light {
+            background: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+        }
+        
+        .activity-icon.bg-info-light {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+        }
+        
+        .activity-icon.bg-purple-light {
+            background: rgba(124, 58, 237, 0.1);
+            color: #7C3AED;
+        }
+        
+        .activity-text {
+            font-size: 0.875rem;
+        }
+        
+        .activity-time {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        
+        /* Quick Stats */
+        .quick-stat {
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .quick-stat .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1F2937;
+        }
+        
+        .quick-stat .label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+        
+        .chart-container-sm {
+            height: 200px;
+        }
+        
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        
+        .welcome-banner h4 {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .welcome-banner p {
+            opacity: 0.9;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+        
+        .welcome-banner .welcome-icon {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 4rem;
+            opacity: 0.15;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .quick-actions .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        /* Loading Overlay */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #loadingOverlay .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #4F46E5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Sidebar Role Display */
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        
+        .sidebar-footer .role-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+        
+        .role-badge.admin { background: #4F46E5; color: #fff; }
+        .role-badge.manager { background: #10B981; color: #fff; }
+        .role-badge.instructor { background: #F59E0B; color: #fff; }
+        .role-badge.trainee { background: #3B82F6; color: #fff; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-banner {
+                padding: 1rem 1.25rem;
+            }
+            
+            .welcome-banner .welcome-icon {
+                font-size: 2.5rem;
+                right: 1rem;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- ============================================ -->
+        <!-- NAVBAR                                        -->
+        <!-- ============================================ -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <form class="d-none d-md-flex me-3" role="search">
+                        <div class="input-group input-group-sm">
+                            <input class="form-control form-control-sm bg-light border-0" type="search" 
+                                   placeholder="Search..." aria-label="Search">
+                            <button class="btn btn-light btn-sm" type="submit">
+                                <i class="fas fa-search text-secondary"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 320px;">
+                            <div class="dropdown-header d-flex justify-content-between">
+                                <span>Notifications</span>
+                                <a href="#" class="text-primary text-decoration-none small">Mark all read</a>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item notification-item">
+                                <div class="d-flex align-items-start">
+                                    <div class="notification-icon bg-success me-2"><i class="fas fa-user-plus text-white"></i></div>
+                                    <div><p class="mb-0 small">New trainee registered</p><small class="text-muted">2 min ago</small></div>
+                                </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ============================================ -->
+        <!-- SIDEBAR (DYNAMIC - Role Based)               -->
+        <!-- ============================================ -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="nav flex-column" id="sidebarMenu">
+                <!-- Sidebar items will be generated by JavaScript -->
+            </ul>
+            <div class="sidebar-footer">
+                <small class="text-muted">STTIMS v1.0.0</small>
+                <br>
+                <div id="userRoleDisplay" class="role-badge">Role: Unknown</div>
+            </div>
+        </nav>
+
+        <!-- ============================================ -->
+        <!-- MAIN CONTENT                                  -->
+        <!-- ============================================ -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 id="welcomeMessage">Welcome back, Admin! 👋</h4>
+                            <p id="dateTime">Today is a great day to manage your training institution.</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="quick-actions">
+                                <a href="trainees.html" class="btn btn-light btn-sm" data-role="Admin,Manager,Instructor">
+                                    <i class="fas fa-user-plus me-1"></i>Add Trainee
+                                </a>
+                                <a href="courses.html" class="btn btn-light btn-sm" data-role="Admin,Manager,Instructor">
+                                    <i class="fas fa-plus-circle me-1"></i>New Course
+                                </a>
+                                <a href="batches.html" class="btn btn-light btn-sm" data-role="Admin,Manager,Instructor">
+                                    <i class="fas fa-layer-group me-1"></i>Create Batch
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="welcome-icon"><i class="fas fa-graduation-cap"></i></div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- STATISTICS CARDS                           -->
+                <!-- ========================================== -->
+                <div class="row g-4 mb-4" id="statCards">
+                    <!-- Total Trainees -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="card stat-card stat-card-primary h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="stat-label text-muted mb-0" id="totalTraineesLabel">Total Trainees</p>
+                                        <h2 class="stat-value mb-0" id="totalTrainees">0</h2>
+                                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 12.5%</span>
+                                    </div>
+                                    <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Instructors -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="card stat-card stat-card-success h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="stat-label text-muted mb-0" id="activeInstructorsLabel">Active Instructors</p>
+                                        <h2 class="stat-value mb-0" id="activeInstructors">0</h2>
+                                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 8.2%</span>
+                                    </div>
+                                    <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Courses -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="card stat-card stat-card-info h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="stat-label text-muted mb-0" id="activeCoursesLabel">Active Courses</p>
+                                        <h2 class="stat-value mb-0" id="activeCourses">0</h2>
+                                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 5.1%</span>
+                                    </div>
+                                    <div class="stat-icon"><i class="fas fa-book"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificates Issued -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="card stat-card stat-card-warning h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="stat-label text-muted mb-0" id="certificatesIssuedLabel">Certificates Issued</p>
+                                        <h2 class="stat-value mb-0" id="certificatesIssued">0</h2>
+                                        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 18.3%</span>
+                                    </div>
+                                    <div class="stat-icon"><i class="fas fa-certificate"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: More Stats -->
+                <div class="row g-4 mb-4">
+                    <!-- Total Batches -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="card stat-card stat-card-primary h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="stat-label text-muted mb-0" id="totalBatchesLabel">Total Batches</p>
+                                        <h2 class="stat-value mb-0" id="totalBatches">0</h2>
+                                    </div>
+                                    <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Enrollments -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="card stat-card stat-card-success h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="stat-label text-muted mb-0" id="activeEnrollmentsLabel">Active Enrollments</p>
+                                        <h2 class="stat-value mb-0" id="activeEnrollments">0</h2>
+                                    </div>
+                                    <div class="stat-icon"><i class="fas fa-edit"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Sessions -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="card stat-card stat-card-info h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="stat-label text-muted mb-0" id="upcomingSessionsLabel">Upcoming Sessions</p>
+                                        <h2 class="stat-value mb-0" id="upcomingSessions">0</h2>
+                                    </div>
+                                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completion Rate -->
+                    <div class="col-xl-3 col-lg-6 col-md-6">
+                        <div class="card stat-card stat-card-warning h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="stat-label text-muted mb-0" id="completionRateLabel">Completion Rate</p>
+                                        <h2 class="stat-value mb-0" id="completionRate">0%</h2>
+                                    </div>
+                                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- CHARTS                                      -->
+                <!-- ========================================== -->
+                <div class="row g-4 mb-4">
+                    <!-- Course Enrollment Chart -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-line me-2 text-primary"></i>Course Enrollment Trends
+                                </h5>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary active" data-period="6m">6 Months</button>
+                                    <button class="btn btn-outline-primary" data-period="1y">1 Year</button>
+                                    <button class="btn btn-outline-primary" data-period="all">All</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="enrollmentChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue & Completion -->
+                    <div class="col-lg-4">
+                        <div class="card mb-3" data-role="Admin,Manager">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-dollar-sign me-2 text-success"></i>Revenue Overview
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container-sm">
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
+                                <div class="row text-center mt-3">
+                                    <div class="col-6">
+                                        <p class="text-muted small mb-0">Total Revenue</p>
+                                        <h6 class="mb-0 text-success" id="totalRevenue">ETB 0</h6>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="text-muted small mb-0">Pending</p>
+                                        <h6 class="mb-0 text-warning" id="pendingRevenue">ETB 0</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Attendance Chart -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-clipboard-check me-2 text-info"></i>Attendance Overview
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container-sm">
+                                    <canvas id="attendanceChart"></canvas>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <span class="badge bg-success me-2">Present</span>
+                                    <span class="badge bg-danger me-2">Absent</span>
+                                    <span class="badge bg-warning">Late</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- RECENT ACTIVITY & QUICK STATS              -->
+                <!-- ========================================== -->
+                <div class="row g-4">
+                    <!-- Recent Activity -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-clock me-2 text-primary"></i>Recent Activity
+                                </h5>
+                                <a href="#" class="text-primary text-decoration-none small">View All</a>
+                            </div>
+                            <div class="card-body p-0" id="activityFeed">
+                                <!-- Activities loaded dynamically -->
+                                <div class="text-center py-4 text-muted" id="activityLoading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                    Loading activities...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-pie me-2 text-primary"></i>Quick Stats
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="quick-stat">
+                                    <div class="number" id="todayRegistrations">0</div>
+                                    <div class="label">Today's Registrations</div>
+                                </div>
+                                <hr>
+                                <div class="quick-stat">
+                                    <div class="number" id="pendingCertificates">0</div>
+                                    <div class="label">Pending Certificates</div>
+                                </div>
+                                <hr>
+                                <div class="quick-stat">
+                                    <div class="number" id="upcomingDeadlines">0</div>
+                                    <div class="label">Upcoming Deadlines</div>
+                                </div>
+                                <hr>
+                                <div class="quick-stat" data-role="Admin,Manager">
+                                    <div class="number" id="totalRevenueQuick">ETB 0</div>
+                                    <div class="label">Total Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- FOOTER                                        -->
+            <!-- ============================================ -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- TOAST CONTAINER                              -->
+    <!-- ============================================ -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- ============================================ -->
+    <!-- LOADING OVERLAY                              -->
+    <!-- ============================================ -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                       -->
+    <!-- ============================================ -->
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+    <script src="../js/dashboard-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const dateTime = document.getElementById('dateTime');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const userRoleDisplay = document.getElementById('userRoleDisplay');
+        
+        // Track if data has been loaded to prevent duplicate requests
+        let dataLoaded = false;
+        let chartsInitialized = false;
+        let refreshInterval = null;
+        
+        // ============================================
+        // Initialize Dashboard (WITH ROLE-BASED SIDEBAR)
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // ============================================
+            // Check authentication
+            // ============================================
+            const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+            const token = localStorage.getItem('authToken');
+            
+            console.log('🔍 Dashboard Auth Check:');
+            console.log('📋 User Data exists:', !!userData);
+            console.log('📋 Auth Token exists:', !!token);
+            
+            // If no user data or token, redirect to login
+            if (!userData || !token) {
+                console.warn('⚠️ No session found, redirecting to login...');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Validate user data
+            try {
+                const user = JSON.parse(userData);
+                if (!user || !user.username) {
+                    console.warn('⚠️ Invalid user data, redirecting to login...');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('authToken');
+                    sessionStorage.removeItem('user');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                console.log('✅ Authenticated as:', user.username);
+                console.log('👤 Role:', user.role || 'Trainee');
+            } catch (e) {
+                console.warn('⚠️ Invalid user data JSON, redirecting to login...');
+                localStorage.removeItem('user');
+                localStorage.removeItem('authToken');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // ============================================
+            // Generate Role-Based Sidebar
+            // ============================================
+            if (sidebarMenu && typeof RoleBasedAccess !== 'undefined') {
+                sidebarMenu.innerHTML = RoleBasedAccess.generateSidebar();
+                console.log('✅ Sidebar generated for role:', RoleBasedAccess.getUserRole());
+            } else {
+                console.warn('⚠️ RoleBasedAccess not available or sidebar menu not found');
+            }
+            
+            // Display user role
+            if (userRoleDisplay) {
+                const role = typeof RoleBasedAccess !== 'undefined' ? RoleBasedAccess.getUserRole() : 'Unknown';
+                userRoleDisplay.textContent = `Role: ${role}`;
+                userRoleDisplay.className = `role-badge ${role.toLowerCase()}`;
+            }
+            
+            // Apply role-based visibility
+            if (typeof RoleBasedAccess !== 'undefined') {
+                RoleBasedAccess.applyRoleBasedVisibility();
+            }
+            
+            // Load user data
+            loadUserData();
+            
+            // Load dashboard statistics (only once)
+            if (!dataLoaded) {
+                loadDashboardStats();
+                loadRecentActivities();
+                dataLoaded = true;
+            }
+            
+            // Initialize charts (only once)
+            if (!chartsInitialized) {
+                initCharts();
+                chartsInitialized = true;
+            }
+            
+            // Update date/time
+            updateDateTime();
+            
+            // Update date/time every minute (not every second)
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            refreshInterval = setInterval(updateDateTime, 60000);
+            
+            // Setup logout
+            setupLogout();
+            
+            console.log('📊 Dashboard loaded for role:', typeof RoleBasedAccess !== 'undefined' ? RoleBasedAccess.getUserRole() : 'Unknown');
+        });
+        
+        // ============================================
+        // Load User Data
+        // ============================================
+        function loadUserData() {
+            try {
+                const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
+                if (userData) {
+                    const user = JSON.parse(userData);
+                    // full_name/first_name now come from the backend for every role:
+                    // Trainee/Instructor -> pulled from their linked profile,
+                    // Admin/Manager -> title-cased username (they have no profile row).
+                    const name = user.full_name || user.first_name || user.username || 'User';
+                    const role = user.role_display || user.role || 'Trainee';
+                    welcomeMessage.textContent = `Welcome back, ${name}! 👋 (${role})`;
+                    console.log('👋 Welcome:', name, 'Role:', role);
+                }
+            } catch (e) {
+                console.warn('Could not load user data:', e);
+            }
+        }
+        
+        // ============================================
+        // Update Date/Time
+        // ============================================
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            dateTime.textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        // ============================================
+        // Show/Hide Loading
+        // ============================================
+        function showLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = 'none';
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const colors = {
+                success: '#d1fae5',
+                error: '#fee2e2',
+                warning: '#fef3c7',
+                info: '#dbeafe'
+            };
+            const textColors = {
+                success: '#065f46',
+                error: '#991b1b',
+                warning: '#92400e',
+                info: '#1e40af'
+            };
+            
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                background: ${colors[type] || colors.info};
+                color: ${textColors[type] || textColors.info};
+                padding: 12px 16px;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                animation: slideIn 0.3s ease;
+                min-width: 250px;
+            `;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" style="
+                    background: none;
+                    border: none;
+                    color: inherit;
+                    font-size: 18px;
+                    cursor: pointer;
+                    padding: 0 4px;
+                ">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto dismiss after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Load Dashboard Statistics
+        // ============================================
+        async function loadDashboardStats() {
+            try {
+                showLoading();
+                const result = await apiCall('/dashboard/stats');
+                const stats = result.data || {};
+                
+                // Update stat cards
+                document.getElementById('totalTrainees').textContent = stats.total_trainees || 0;
+                document.getElementById('activeInstructors').textContent = stats.active_instructors || 0;
+                document.getElementById('activeCourses').textContent = stats.active_courses || 0;
+                document.getElementById('certificatesIssued').textContent = stats.certificates_issued || 0;
+                document.getElementById('totalBatches').textContent = stats.total_batches || 0;
+                document.getElementById('activeEnrollments').textContent = stats.active_enrollments || 0;
+                document.getElementById('upcomingSessions').textContent = stats.upcoming_sessions || 0;
+                document.getElementById('completionRate').textContent = (stats.completion_rate || 0) + '%';
+                
+                // Relabel cards per role (e.g. "Total Trainees" -> "My Trainees" for Instructor/Trainee)
+                if (stats.labels) {
+                    const labelMap = {
+                        totalTraineesLabel: stats.labels.card1,
+                        activeInstructorsLabel: stats.labels.card2,
+                        activeCoursesLabel: stats.labels.card3,
+                        certificatesIssuedLabel: stats.labels.card4,
+                        totalBatchesLabel: stats.labels.card5,
+                        activeEnrollmentsLabel: stats.labels.card6,
+                        upcomingSessionsLabel: stats.labels.card7,
+                        completionRateLabel: stats.labels.card8
+                    };
+                    Object.entries(labelMap).forEach(([id, text]) => {
+                        const el = document.getElementById(id);
+                        if (el && text) el.textContent = text;
+                    });
+                }
+                
+                // Quick stats
+                document.getElementById('todayRegistrations').textContent = stats.today_registrations || 0;
+                document.getElementById('pendingCertificates').textContent = stats.pending_certificates || 0;
+                document.getElementById('upcomingDeadlines').textContent = stats.upcoming_deadlines || 0;
+                
+                // Revenue
+                const revenue = stats.total_revenue || 0;
+                const formattedRevenue = `ETB ${revenue.toLocaleString()}`;
+                document.getElementById('totalRevenue').textContent = formattedRevenue;
+                document.getElementById('totalRevenueQuick').textContent = formattedRevenue;
+                document.getElementById('pendingRevenue').textContent = `ETB ${(stats.pending_revenue || 0).toLocaleString()}`;
+                
+                console.log('📊 Dashboard stats loaded');
+            } catch (error) {
+                console.error('Failed to load dashboard stats:', error);
+                showToast('Failed to load dashboard data', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Load Recent Activities (Only Once)
+        // ============================================
+        async function loadRecentActivities() {
+            const feed = document.getElementById('activityFeed');
+            
+            try {
+                const result = await apiCall('/dashboard/activities');
+                const activities = result.data || [];
+                
+                if (activities.length === 0) {
+                    feed.innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-inbox fa-2x d-block mb-2"></i>
+                            No recent activities
+                        </div>
+                    `;
+                    return;
+                }
+                
+                feed.innerHTML = activities.map(activity => `
+                    <div class="activity-item d-flex align-items-start">
+                        <div class="activity-icon ${activity.iconBg || 'bg-primary-light'} me-3">
+                            <i class="fas ${activity.icon || 'fa-clock'}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="activity-text mb-0">${activity.message}</p>
+                            <small class="activity-time">${activity.time_ago || 'Just now'}</small>
+                        </div>
+                    </div>
+                `).join('');
+                
+                console.log('📋 Activities loaded:', activities.length);
+            } catch (error) {
+                console.error('Failed to load activities:', error);
+                feed.innerHTML = `
+                    <div class="text-center py-4 text-danger">
+                        <i class="fas fa-exclamation-circle fa-2x d-block mb-2"></i>
+                        Failed to load activities
+                    </div>
+                `;
+            }
+        }
+        
+        // ============================================
+        // Initialize Charts (Only Once)
+        // ============================================
+        async function initCharts() {
+            // All three charts now pull real, role-scoped data from the
+            // backend instead of hardcoded placeholder numbers.
+            await Promise.all([
+                loadEnrollmentTrendsChart(),
+                loadRevenueChart(),
+                loadAttendanceChart()
+            ]);
+            console.log('📊 Charts initialized with live data');
+        }
+
+        async function loadEnrollmentTrendsChart() {
+            const enrollmentCtx = document.getElementById('enrollmentChart').getContext('2d');
+            let labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+            let data = [0, 0, 0, 0, 0, 0, 0];
+
+            try {
+                const result = await apiCall('/dashboard/enrollment-trends');
+                if (result.data) {
+                    labels = result.data.labels || labels;
+                    data = result.data.data || data;
+                }
+            } catch (error) {
+                console.error('Failed to load enrollment trends:', error);
+            }
+
+            new Chart(enrollmentCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Enrollments',
+                        data,
+                        borderColor: '#4F46E5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        async function loadRevenueChart() {
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            let labels = ['Paid', 'Pending', 'Partial'];
+            let data = [0, 0, 0];
+
+            try {
+                const result = await apiCall('/dashboard/revenue-trends');
+                if (result.data) {
+                    labels = result.data.labels || labels;
+                    data = result.data.data || data;
+                }
+            } catch (error) {
+                console.error('Failed to load revenue trends:', error);
+            }
+
+            new Chart(revenueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: ['#10B981', '#F59E0B', '#6B7280'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, fontSize: 10 }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        async function loadAttendanceChart() {
+            const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+            let data = [0, 0, 0];
+
+            try {
+                const result = await apiCall('/dashboard/attendance-summary');
+                if (result.data) {
+                    data = [
+                        result.data.present || 0,
+                        result.data.absent || 0,
+                        result.data.late || 0
+                    ];
+                }
+            } catch (error) {
+                console.error('Failed to load attendance summary:', error);
+            }
+
+            new Chart(attendanceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Present', 'Absent', 'Late'],
+                    datasets: [{
+                        data,
+                        backgroundColor: ['#10B981', '#EF4444', '#F59E0B'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, fontSize: 10 }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+        
+        // ============================================
+        // Setup Logout
+        // ============================================
+        function setupLogout() {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Show confirmation
+                document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+                const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                confirmModal.show();
+                
+                document.getElementById('confirmBtn').onclick = function() {
+                    // Clear all storage
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('user');
+                    sessionStorage.removeItem('user');
+                    
+                    // Redirect to login
+                    window.location.href = 'login.html';
+                };
+            });
+        }
+        
+        // ============================================
+        // Sidebar Toggle
+        // ============================================
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+        
+        document.getElementById('sidebarClose').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('show');
+        });
+        
+        // Close sidebar on outside click
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+        
+        // ============================================
+        // Cleanup on page unload
+        // ============================================
+        window.addEventListener('beforeunload', function() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        });
+        
+        // ============================================
+        // Console Log
+        // ============================================
+        console.log('📊 STTIMS Dashboard loaded successfully');
+        console.log('🔗 API Integration: api.js + dashboard-api.js loaded');
+        console.log('🔐 Role-Based Sidebar: loaded');
+        console.log('📋 Data loaded once - no continuous polling');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

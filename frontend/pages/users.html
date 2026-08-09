@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* User Management Specific Styles */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #fff;
+        }
+        
+        .user-avatar.admin { background: #4F46E5; }
+        .user-avatar.manager { background: #7C3AED; }
+        .user-avatar.instructor { background: #10B981; }
+        .user-avatar.trainee { background: #F59E0B; }
+        .user-avatar.default { background: #6B7280; }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .table-container .table {
+            min-width: 800px;
+        }
+        
+        /* Role Badges */
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .role-badge.admin { background: #DBEAFE; color: #1E40AF; }
+        .role-badge.manager { background: #EDE9FE; color: #5B21B6; }
+        .role-badge.instructor { background: #D1FAE5; color: #065F46; }
+        .role-badge.trainee { background: #FEF3C7; color: #92400E; }
+        
+        /* Actions Dropdown */
+        .actions-dropdown .dropdown-item {
+            font-size: 0.875rem;
+            padding: 0.4rem 1rem;
+        }
+        
+        .actions-dropdown .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .actions-dropdown .dropdown-item.text-danger:hover {
+            background: #FEE2E2;
+        }
+        
+        /* Modal Styles */
+        .modal-body .form-control:focus {
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .password-strength {
+            height: 4px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .password-strength .bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .password-strength .bar.weak { width: 25%; background: #EF4444; }
+        .password-strength .bar.medium { width: 50%; background: #F59E0B; }
+        .password-strength .bar.strong { width: 75%; background: #3B82F6; }
+        .password-strength .bar.very-strong { width: 100%; background: #10B981; }
+        
+        .password-hint {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-top: 0.25rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <form class="d-none d-md-flex me-3" role="search">
+                        <div class="input-group input-group-sm">
+                            <input class="form-control form-control-sm bg-light border-0" type="search" placeholder="Search...">
+                            <button class="btn btn-light btn-sm" type="submit">
+                                <i class="fas fa-search text-secondary"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">User Management</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-users-cog me-2 text-primary"></i>User Management
+                    </h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="openAddUserModal()">
+                            <i class="fas fa-user-plus me-1"></i>Add User
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput" 
+                                       placeholder="Search by name, email..." oninput="filterUsers()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Role</label>
+                            <select class="form-select" id="roleFilter" onchange="filterUsers()">
+                                <option value="">All Roles</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Instructor">Instructor</option>
+                                <option value="Trainee">Trainee</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterUsers()">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Locked">Locked</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-outline-secondary btn-sm" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Users List
+                            <span class="badge bg-primary ms-2" id="userCount">0</span>
+                        </h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="loadUsers()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table table-striped table-hover mb-0" id="usersTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 50px;">#</th>
+                                        <th>User</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th style="width: 120px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <!-- Users will be loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="text-muted small" id="tableInfo">Showing 0 of 0 users</span>
+                        <nav id="paginationContainer"></nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- Add/Edit User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2 text-primary"></i>
+                        <span id="userModalTitle">Add New User</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="userForm" novalidate>
+                        <input type="hidden" id="editUserId">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Username <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="username" 
+                                           placeholder="Enter username" required>
+                                    <div class="invalid-feedback">Username is required (3-20 characters)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" 
+                                           placeholder="Enter email" required>
+                                    <div class="invalid-feedback">Please enter a valid email</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Role <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="role" required>
+                                        <option value="">Select Role</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Manager">Manager</option>
+                                        <option value="Instructor">Instructor</option>
+                                        <option value="Trainee">Trainee</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a role</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="status">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                        <option value="Locked">Locked</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row" id="passwordFields">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" id="passwordLabel">Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="password" 
+                                           placeholder="Enter password" required>
+                                    <div class="invalid-feedback">Password must be at least 8 characters</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" 
+                                           placeholder="Confirm password">
+                                    <div class="invalid-feedback">Passwords do not match</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Password Strength Indicator -->
+                        <div id="passwordStrengthContainer" style="display: none;">
+                            <div class="password-strength">
+                                <div class="bar" id="passwordStrengthBar"></div>
+                            </div>
+                            <div class="password-hint" id="passwordStrengthText">Password must be at least 8 characters</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" id="saveUserBtn">
+                        <i class="fas fa-save me-1"></i>Save User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View User Modal -->
+    <div class="modal fade" id="viewUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user me-2 text-primary"></i>User Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewUserBody">
+                    <!-- User details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-key me-2 text-warning"></i>Reset Password
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">Reset password for <strong id="resetUserDisplay"></strong></p>
+                    <form id="resetPasswordForm">
+                        <input type="hidden" id="resetUserId">
+                        <div class="form-group">
+                            <label class="form-label">New Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="resetNewPassword" 
+                                   placeholder="Enter new password" required>
+                            <div class="invalid-feedback">Password must be at least 8 characters</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="resetConfirmPassword" 
+                                   placeholder="Confirm new password" required>
+                            <div class="invalid-feedback">Passwords do not match</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-warning" id="resetPasswordBtn">
+                        <i class="fas fa-check me-1"></i>Reset Password
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+    <script src="../js/users-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let currentPage = 1;
+        let totalPages = 1;
+        let perPage = 10;
+        let usersData = [];
+        let deleteUserId = null;
+        
+        const userModal = new bootstrap.Modal(document.getElementById('addUserModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+        const resetModal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load users
+            loadUsers();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Save user button
+            document.getElementById('saveUserBtn').addEventListener('click', saveUser);
+            
+            // Reset password button
+            document.getElementById('resetPasswordBtn').addEventListener('click', resetPassword);
+            
+            // Confirm button
+            document.getElementById('confirmBtn').addEventListener('click', confirmDelete);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Password strength checker
+            document.getElementById('password').addEventListener('input', checkPasswordStrength);
+            document.getElementById('confirmPassword').addEventListener('input', validateConfirmPassword);
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Users
+        // ============================================
+        async function loadUsers(page = 1) {
+            showLoading();
+            currentPage = page;
+            
+            const search = document.getElementById('searchInput').value;
+            const role = document.getElementById('roleFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: perPage,
+                    search: search,
+                    role: role.toLowerCase(),
+                    status: status
+                });
+                
+                const result = await apiCall(`/users?${params.toString()}`);
+                
+                usersData = result.data || [];
+                totalPages = result.total_pages || 1;
+                
+                renderTable(usersData);
+                renderPagination();
+                updateTableInfo(result.total || 0);
+                
+            } catch (error) {
+                showToast('Failed to load users: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Render Table
+        // ============================================
+        function renderTable(users) {
+            const tbody = document.getElementById('usersTableBody');
+            const userCount = document.getElementById('userCount');
+            
+            userCount.textContent = users.length;
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="fas fa-users-slash fa-2x d-block mb-2"></i>
+                            No users found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = users.map((user, index) => `
+                <tr>
+                    <td>${((currentPage - 1) * perPage) + index + 1}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="user-avatar ${user.role?.toLowerCase() || 'default'} me-2">
+                                ${user.username ? user.username.charAt(0).toUpperCase() : '?'}
+                            </div>
+                            <div>
+                                <div class="fw-bold">${user.username || 'N/A'}</div>
+                                <small class="text-muted">${user.role || 'No role'}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.email || '-'}</td>
+                    <td>
+                        <span class="role-badge ${user.role?.toLowerCase() || ''}">
+                            ${user.role || 'N/A'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${user.status === 'Active' ? 'bg-success' : user.status === 'Inactive' ? 'bg-secondary' : 'bg-danger'}">
+                            ${user.status || 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="dropdown actions-dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="viewUser(${user.user_id})">
+                                        <i class="fas fa-eye text-primary"></i> View
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="editUser(${user.user_id})">
+                                        <i class="fas fa-edit text-warning"></i> Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="openResetPassword(${user.user_id}, '${user.username}')">
+                                        <i class="fas fa-key text-info"></i> Reset Password
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" onclick="openDeleteModal(${user.user_id})">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // ============================================
+        // Render Pagination
+        // ============================================
+        function renderPagination() {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `<ul class="pagination pagination-sm mb-0">`;
+            
+            // Previous
+            html += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadUsers(${currentPage - 1})">«</a>
+                </li>
+            `;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadUsers(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            // Next
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadUsers(${currentPage + 1})">»</a>
+                </li>
+            `;
+            
+            html += `</ul>`;
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // Update Table Info
+        // ============================================
+        function updateTableInfo(total) {
+            const start = (currentPage - 1) * perPage + 1;
+            const end = Math.min(start + perPage - 1, total);
+            document.getElementById('tableInfo').textContent = 
+                `Showing ${total > 0 ? start : 0} to ${end} of ${total} users`;
+        }
+        
+        // ============================================
+        // Filter Functions
+        // ============================================
+        function filterUsers() {
+            loadUsers(1);
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('roleFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            loadUsers(1);
+        }
+        
+        // ============================================
+        // Open Add User Modal
+        // ============================================
+        function openAddUserModal() {
+            document.getElementById('userModalTitle').textContent = 'Add New User';
+            document.getElementById('editUserId').value = '';
+            document.getElementById('userForm').reset();
+            document.getElementById('passwordFields').style.display = 'flex';
+            document.getElementById('passwordLabel').innerHTML = 'Password <span class="text-danger">*</span>';
+            document.getElementById('password').required = true;
+            document.getElementById('passwordStrengthContainer').style.display = 'none';
+            userModal.show();
+        }
+        
+        // ============================================
+        // Edit User
+        // ============================================
+        async function editUser(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/users/${id}`);
+                const user = result.data;
+                
+                document.getElementById('userModalTitle').textContent = 'Edit User';
+                document.getElementById('editUserId').value = id;
+                document.getElementById('username').value = user.username || '';
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('role').value = user.role || '';
+                document.getElementById('status').value = user.status || 'Active';
+                document.getElementById('passwordFields').style.display = 'none';
+                document.getElementById('password').required = false;
+                document.getElementById('passwordStrengthContainer').style.display = 'none';
+                
+                userModal.show();
+            } catch (error) {
+                showToast('Failed to load user data: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Save User
+        // ============================================
+        async function saveUser() {
+            const id = document.getElementById('editUserId').value;
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const role = document.getElementById('role').value;
+            const status = document.getElementById('status').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate
+            if (!username || username.length < 3) {
+                showToast('Username must be at least 3 characters', 'warning');
+                return;
+            }
+            
+            if (!email || !email.includes('@')) {
+                showToast('Please enter a valid email address', 'warning');
+                return;
+            }
+            
+            if (!role) {
+                showToast('Please select a role', 'warning');
+                return;
+            }
+            
+            // Check password only for new users
+            if (!id && !password) {
+                showToast('Password is required for new users', 'warning');
+                return;
+            }
+            
+            if (!id && password.length < 8) {
+                showToast('Password must be at least 8 characters', 'warning');
+                return;
+            }
+            
+            if (!id && password !== confirmPassword) {
+                showToast('Passwords do not match', 'warning');
+                return;
+            }
+            
+            const data = {
+                username: username,
+                email: email,
+                role: role,
+                status: status
+            };
+            
+            if (!id) {
+                data.password = password;
+            }
+            
+            try {
+                showLoading();
+                
+                if (id) {
+                    await apiCall(`/users/${id}`, 'PUT', data);
+                    showToast('User updated successfully!', 'success');
+                } else {
+                    await apiCall('/users', 'POST', data);
+                    showToast('User created successfully!', 'success');
+                }
+                
+                userModal.hide();
+                loadUsers(currentPage);
+                
+            } catch (error) {
+                showToast('Failed to save user: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // View User
+        // ============================================
+        async function viewUser(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/users/${id}`);
+                const user = result.data;
+                
+                document.getElementById('viewUserBody').innerHTML = `
+                    <div class="text-center mb-3">
+                        <div class="user-avatar ${user.role?.toLowerCase() || 'default'} mx-auto" 
+                             style="width: 64px; height: 64px; font-size: 1.5rem;">
+                            ${user.username ? user.username.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <h5 class="mt-2">${user.username || 'N/A'}</h5>
+                        <span class="role-badge ${user.role?.toLowerCase() || ''}">${user.role || 'No role'}</span>
+                    </div>
+                    <hr>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">${user.email || '-'}</dd>
+                        
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge ${user.status === 'Active' ? 'bg-success' : user.status === 'Inactive' ? 'bg-secondary' : 'bg-danger'}">
+                                ${user.status || 'Inactive'}
+                            </span>
+                        </dd>
+                        
+                        <dt class="col-sm-4">Last Login</dt>
+                        <dd class="col-sm-8">${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</dd>
+                        
+                        <dt class="col-sm-4">Login Attempts</dt>
+                        <dd class="col-sm-8">${user.login_attempts || 0}</dd>
+                        
+                        <dt class="col-sm-4">Created At</dt>
+                        <dd class="col-sm-8">${user.created_at ? new Date(user.created_at).toLocaleString() : '-'}</dd>
+                    </dl>
+                `;
+                
+                viewModal.show();
+            } catch (error) {
+                showToast('Failed to load user details', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Reset Password
+        // ============================================
+        function openResetPassword(id, username) {
+            document.getElementById('resetUserId').value = id;
+            document.getElementById('resetUserDisplay').textContent = username || 'User';
+            document.getElementById('resetPasswordForm').reset();
+            resetModal.show();
+        }
+        
+        // ============================================
+        // Reset Password
+        // ============================================
+        async function resetPassword() {
+            const id = document.getElementById('resetUserId').value;
+            const password = document.getElementById('resetNewPassword').value;
+            const confirm = document.getElementById('resetConfirmPassword').value;
+            
+            if (!password || password.length < 8) {
+                showToast('Password must be at least 8 characters', 'warning');
+                return;
+            }
+            
+            if (password !== confirm) {
+                showToast('Passwords do not match', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                await apiCall(`/users/${id}/reset-password`, 'POST', { password: password });
+                showToast('Password reset successfully!', 'success');
+                resetModal.hide();
+            } catch (error) {
+                showToast('Failed to reset password: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Delete Modal
+        // ============================================
+        function openDeleteModal(id) {
+            deleteUserId = id;
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to delete this user? This action cannot be undone.';
+            confirmModal.show();
+        }
+        
+        // ============================================
+        // Confirm Delete
+        // ============================================
+        async function confirmDelete() {
+            if (!deleteUserId) return;
+            
+            try {
+                showLoading();
+                await apiCall(`/users/${deleteUserId}`, 'DELETE');
+                showToast('User deleted successfully!', 'success');
+                confirmModal.hide();
+                loadUsers(currentPage);
+            } catch (error) {
+                showToast('Failed to delete user: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                deleteUserId = null;
+            }
+        }
+        
+        // ============================================
+        // Password Strength Checker
+        // ============================================
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const container = document.getElementById('passwordStrengthContainer');
+            const bar = document.getElementById('passwordStrengthBar');
+            const text = document.getElementById('passwordStrengthText');
+            
+            if (!password) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            
+            let strength = 0;
+            let level = 'weak';
+            let message = 'Weak password';
+            
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 10;
+            if (/[a-z]/.test(password)) strength += 20;
+            if (/[A-Z]/.test(password)) strength += 20;
+            if (/[0-9]/.test(password)) strength += 15;
+            if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
+            
+            if (strength >= 80) { level = 'very-strong'; message = 'Very strong password!'; }
+            else if (strength >= 60) { level = 'strong'; message = 'Strong password'; }
+            else if (strength >= 40) { level = 'medium'; message = 'Medium strength password'; }
+            else { level = 'weak'; message = 'Weak password - add more characters, numbers, and symbols'; }
+            
+            bar.className = `bar ${level}`;
+            text.textContent = message;
+            
+            // Also validate confirm password
+            validateConfirmPassword();
+        }
+        
+        function validateConfirmPassword() {
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const feedback = document.getElementById('confirmPassword').nextElementSibling;
+            
+            if (confirm && password !== confirm) {
+                document.getElementById('confirmPassword').classList.add('is-invalid');
+                feedback.textContent = 'Passwords do not match';
+            } else if (confirm) {
+                document.getElementById('confirmPassword').classList.remove('is-invalid');
+                document.getElementById('confirmPassword').classList.add('is-valid');
+            } else {
+                document.getElementById('confirmPassword').classList.remove('is-invalid');
+                document.getElementById('confirmPassword').classList.remove('is-valid');
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+            confirmModal.show();
+            
+            document.getElementById('confirmBtn').onclick = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            };
+        }
+        
+        console.log('👥 User Management page loaded successfully');
+        console.log('🔗 API Integration: api.js + users-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

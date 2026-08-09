@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>STTIMS API Test</title>
+</head>
+<body>
+    <h1>STTIMS API Test</h1>
+    <button onclick="testAPI()">Test Login</button>
+    <div id="result"></div>
+
+    <script>
+    async function testAPI() {
+        const result = document.getElementById('result');
+        result.innerHTML = 'Testing...';
+        
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    username_or_email: 'admin',
+                    password: 'Admin123!'
+                })
+            });
+            
+            const data = await response.json();
+            result.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            
+        } catch (error) {
+            result.innerHTML = '❌ Error: ' + error.message;
+            console.error('Error:', error);
+        }
+    }
+    </script>
+</body>
+</html>

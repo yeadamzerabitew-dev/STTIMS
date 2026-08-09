@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STTIMS - Trainee Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f0f2f5; padding: 20px; }
+        .card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .table th { background: #f8f9fa; }
+        .badge-active { background: #10B981; }
+        .badge-inactive { background: #EF4444; }
+        .loading { text-align: center; padding: 50px; }
+        .loading .spinner { width: 3rem; height: 3rem; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-user-graduate text-primary"></i> Trainee Management</h1>
+            <button class="btn btn-primary" onclick="openAddModal()">
+                <i class="fas fa-plus"></i> Add Trainee
+            </button>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Stats -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="card p-3">
+                    <h6 class="text-muted">Total Trainees</h6>
+                    <h2 class="mb-0" id="totalTrainees">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3">
+                    <h6 class="text-muted">Active</h6>
+                    <h2 class="mb-0" id="activeTrainees">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3">
+                    <h6 class="text-muted">Inactive</h6>
+                    <h2 class="mb-0" id="inactiveTrainees">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3">
+                    <h6 class="text-muted">Last Updated</h6>
+                    <h6 class="mb-0" id="lastUpdated">-</h6>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Gender</th>
+                                <th>Education</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="traineesTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="loading">
+                                        <div class="spinner-border text-primary spinner" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2 text-muted">Loading trainees...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="traineeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Add New Trainee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="traineeForm">
+                        <input type="hidden" id="editId">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" id="middleName">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone *</label>
+                                <input type="text" class="form-control" id="phone" required>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Gender</label>
+                                <select class="form-control" id="gender">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dateOfBirth">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Education Level</label>
+                                <select class="form-control" id="educationLevel">
+                                    <option value="High School">High School</option>
+                                    <option value="Diploma">Diploma</option>
+                                    <option value="BSc">BSc</option>
+                                    <option value="MSc">MSc</option>
+                                    <option value="PhD">PhD</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Contact</label>
+                                <input type="text" class="form-control" id="emergencyName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Phone</label>
+                                <input type="text" class="form-control" id="emergencyPhone">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-control" id="status">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTrainee()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ============================================
+        // API Configuration
+        // ============================================
+        const API_BASE = 'http://127.0.0.1:5000/api';
+        
+        let trainees = [];
+        let modal = null;
+
+        // ============================================
+        // Load Trainees
+        // ============================================
+        async function loadTrainees() {
+            try {
+                const response = await fetch(`${API_BASE}/trainees`, {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Trainees data:', data);
+                
+                if (data.status === 'success' && data.data) {
+                    trainees = data.data;
+                    renderTable();
+                    updateStats();
+                } else {
+                    showAlert('Failed to load trainees', 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading trainees:', error);
+                showAlert('Error loading trainees: ' + error.message, 'danger');
+                // Show error in table
+                document.getElementById('traineesTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-danger py-4">
+                            <i class="fas fa-exclamation-circle fa-2x d-block mb-2"></i>
+                            Failed to load trainees. Make sure the backend is running.
+                            <br><small>Error: ${error.message}</small>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // ============================================
+        // Render Table
+        // ============================================
+        function renderTable() {
+            const tbody = document.getElementById('traineesTableBody');
+            
+            if (!trainees || trainees.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="fas fa-user-graduate fa-2x d-block mb-2"></i>
+                            No trainees found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            trainees.forEach(t => {
+                const fullName = `${t.first_name || ''} ${t.middle_name || ''} ${t.last_name || ''}`.trim();
+                const statusBadge = t.status === 'Active' 
+                    ? '<span class="badge bg-success">Active</span>' 
+                    : '<span class="badge bg-secondary">Inactive</span>';
+                
+                html += `
+                    <tr>
+                        <td><code>${t.trainee_code || 'N/A'}</code></td>
+                        <td><strong>${fullName}</strong></td>
+                        <td>${t.email || 'N/A'}</td>
+                        <td>${t.phone_number || 'N/A'}</td>
+                        <td>${t.gender || 'N/A'}</td>
+                        <td>${t.educational_level || 'N/A'}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewTrainee(${t.trainee_id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="editTrainee(${t.trainee_id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTrainee(${t.trainee_id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        // ============================================
+        // Update Stats
+        // ============================================
+        function updateStats() {
+            document.getElementById('totalTrainees').textContent = trainees.length;
+            const active = trainees.filter(t => t.status === 'Active').length;
+            const inactive = trainees.filter(t => t.status === 'Inactive').length;
+            document.getElementById('activeTrainees').textContent = active;
+            document.getElementById('inactiveTrainees').textContent = inactive;
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        }
+
+        // ============================================
+        // CRUD Operations
+        // ============================================
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Trainee';
+            document.getElementById('editId').value = '';
+            document.getElementById('traineeForm').reset();
+            modal = new bootstrap.Modal(document.getElementById('traineeModal'));
+            modal.show();
+        }
+
+        async function editTrainee(id) {
+            try {
+                const response = await fetch(`${API_BASE}/trainees/${id}`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data) {
+                    const t = data.data;
+                    document.getElementById('modalTitle').textContent = 'Edit Trainee';
+                    document.getElementById('editId').value = t.trainee_id;
+                    document.getElementById('firstName').value = t.first_name || '';
+                    document.getElementById('middleName').value = t.middle_name || '';
+                    document.getElementById('lastName').value = t.last_name || '';
+                    document.getElementById('email').value = t.email || '';
+                    document.getElementById('phone').value = t.phone_number || '';
+                    document.getElementById('gender').value = t.gender || 'Male';
+                    document.getElementById('dateOfBirth').value = t.date_of_birth || '';
+                    document.getElementById('educationLevel').value = t.educational_level || 'BSc';
+                    document.getElementById('emergencyName').value = t.emergency_contact_name || '';
+                    document.getElementById('emergencyPhone').value = t.emergency_contact_phone || '';
+                    document.getElementById('status').value = t.status || 'Active';
+                    
+                    modal = new bootstrap.Modal(document.getElementById('traineeModal'));
+                    modal.show();
+                }
+            } catch (error) {
+                console.error('Error loading trainee:', error);
+                showAlert('Error loading trainee details', 'danger');
+            }
+        }
+
+        async function viewTrainee(id) {
+            try {
+                const response = await fetch(`${API_BASE}/trainees/${id}`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data) {
+                    const t = data.data;
+                    const fullName = `${t.first_name || ''} ${t.middle_name || ''} ${t.last_name || ''}`.trim();
+                    alert(`
+                        Trainee Details:
+                        -----------------
+                        Code: ${t.trainee_code}
+                        Name: ${fullName}
+                        Email: ${t.email}
+                        Phone: ${t.phone_number}
+                        Gender: ${t.gender}
+                        DOB: ${t.date_of_birth}
+                        Education: ${t.educational_level}
+                        Status: ${t.status}
+                    `);
+                }
+            } catch (error) {
+                console.error('Error viewing trainee:', error);
+                showAlert('Error loading trainee details', 'danger');
+            }
+        }
+
+        async function saveTrainee() {
+            const id = document.getElementById('editId').value;
+            const data = {
+                first_name: document.getElementById('firstName').value,
+                middle_name: document.getElementById('middleName').value,
+                last_name: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone_number: document.getElementById('phone').value,
+                gender: document.getElementById('gender').value,
+                date_of_birth: document.getElementById('dateOfBirth').value,
+                educational_level: document.getElementById('educationLevel').value,
+                emergency_contact_name: document.getElementById('emergencyName').value,
+                emergency_contact_phone: document.getElementById('emergencyPhone').value,
+                status: document.getElementById('status').value
+            };
+            
+            try {
+                const url = id ? `${API_BASE}/trainees/${id}` : `${API_BASE}/trainees`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert(id ? 'Trainee updated!' : 'Trainee created!', 'success');
+                    if (modal) modal.hide();
+                    loadTrainees();
+                } else {
+                    showAlert(result.message || 'Failed to save', 'danger');
+                }
+            } catch (error) {
+                console.error('Error saving trainee:', error);
+                showAlert('Error saving trainee', 'danger');
+            }
+        }
+
+        async function deleteTrainee(id) {
+            if (!confirm('Are you sure you want to delete this trainee?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/trainees/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('Trainee deleted!', 'success');
+                    loadTrainees();
+                } else {
+                    showAlert(result.message || 'Failed to delete', 'danger');
+                }
+            } catch (error) {
+                console.error('Error deleting trainee:', error);
+                showAlert('Error deleting trainee', 'danger');
+            }
+        }
+
+        // ============================================
+        // Utility Functions
+        // ============================================
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const colors = {
+                success: 'success',
+                danger: 'danger',
+                warning: 'warning',
+                info: 'info'
+            };
+            
+            container.innerHTML = `
+                <div class="alert alert-${colors[type] || 'info'} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => container.innerHTML = '', 300);
+                }
+            }, 5000);
+        }
+
+        // ============================================
+        // Initialize
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Trainee Management page loaded');
+            loadTrainees();
+        });
+
+        // Make functions globally accessible
+        window.openAddModal = openAddModal;
+        window.editTrainee = editTrainee;
+        window.viewTrainee = viewTrainee;
+        window.deleteTrainee = deleteTrainee;
+        window.saveTrainee = saveTrainee;
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

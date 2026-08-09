@@ -1,0 +1,264 @@
+/* ============================================
+   STTIMS - Main Styles
+   ============================================ */
+
+:root {
+    --primary: #4F46E5;
+    --primary-dark: #4338CA;
+    --secondary: #7C3AED;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --info: #3B82F6;
+    --dark: #1F2937;
+    --gray: #6B7280;
+    --light: #F3F4F6;
+    --white: #FFFFFF;
+    --sidebar-width: 250px;
+    --navbar-height: 56px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background-color: var(--light);
+    color: var(--dark);
+    padding-top: var(--navbar-height);
+}
+
+.navbar {
+    height: var(--navbar-height);
+    background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 1050;
+}
+
+.navbar-brand { font-weight: 700; font-size: 1.25rem; }
+.navbar .btn-link { color: rgba(255,255,255,0.9) !important; }
+.navbar .btn-link:hover { color: #fff !important; }
+
+.notification-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sidebar {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--dark);
+    color: var(--white);
+    overflow-y: auto;
+    z-index: 1040;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.sidebar-header h5 { margin: 0; font-weight: 600; }
+.sidebar-close { display: none; }
+
+.sidebar .nav { flex: 1; padding: 0.5rem 0; }
+.sidebar .nav-item { padding: 0 0.75rem; }
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.7);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+.sidebar .nav-link i { width: 24px; margin-right: 12px; }
+.sidebar .nav-link:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.sidebar .nav-link.active { color: #fff; background: var(--primary); }
+
+.sidebar-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    min-height: calc(100vh - var(--navbar-height));
+    display: flex;
+    flex-direction: column;
+}
+
+.page-content { flex: 1; padding: 1.5rem; }
+
+.stat-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+}
+.stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.stat-card .stat-label { font-size: 0.875rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-card .stat-value { font-size: 2rem; font-weight: 700; margin-top: 0.25rem; }
+.stat-card .stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+.stat-card-primary .stat-icon { background: rgba(79,70,229,0.1); color: var(--primary); }
+.stat-card-success .stat-icon { background: rgba(16,185,129,0.1); color: var(--success); }
+.stat-card-info .stat-icon { background: rgba(59,130,246,0.1); color: var(--info); }
+.stat-card-warning .stat-icon { background: rgba(245,158,11,0.1); color: var(--warning); }
+
+.footer {
+    background: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 0.5rem;
+}
+.breadcrumb-item a { color: var(--gray); text-decoration: none; }
+.breadcrumb-item a:hover { color: var(--primary); }
+
+.sidebar-overlay {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1035;
+    display: none;
+}
+.sidebar-overlay.show { display: block; }
+
+@media (max-width: 992px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.show { transform: translateX(0); }
+    .sidebar-close { display: block !important; }
+    .main-content { margin-left: 0; }
+}
+
+@media (max-width: 576px) {
+    .page-content { padding: 1rem; }
+    .stat-card .stat-value { font-size: 1.5rem; }
+}
+/* ============================================
+   RESPONSIVE OVERRIDES
+   ============================================ */
+
+/* Import responsive styles */
+@import url('responsive.css');
+
+/* Mobile-first container padding */
+.container-fluid {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+@media (max-width: 575.98px) {
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+/* Responsive card grid */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 575.98px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Responsive image */
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsive table wrapper */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Responsive modals */
+@media (max-width: 575.98px) {
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .modal-dialog-centered {
+        min-height: calc(100% - 1rem);
+    }
+}
+
+/* Responsive cards */
+@media (max-width: 575.98px) {
+    .card-body {
+        padding: 0.75rem;
+    }
+    
+    .card-header {
+        padding: 0.6rem 0.75rem;
+    }
+    
+    .card-footer {
+        padding: 0.6rem 0.75rem;
+    }
+}
+
+/* Responsive dropdowns */
+@media (max-width: 575.98px) {
+    .dropdown-menu {
+        min-width: 200px;
+    }
+}
+
+/* Responsive alerts */
+@media (max-width: 575.98px) {
+    .alert {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Responsive badges */
+@media (max-width: 575.98px) {
+    .badge {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.4rem;
+    }
+}

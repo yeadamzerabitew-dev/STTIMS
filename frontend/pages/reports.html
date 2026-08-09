@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Reports Specific Styles */
+        .report-card {
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+            height: 100%;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        .report-card .report-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .report-card .report-icon.blue { background: rgba(79, 70, 229, 0.1); color: #4F46E5; }
+        .report-card .report-icon.green { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+        .report-card .report-icon.orange { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+        .report-card .report-icon.red { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+        .report-card .report-icon.purple { background: rgba(124, 58, 237, 0.1); color: #7C3AED; }
+        .report-card .report-icon.pink { background: rgba(236, 72, 153, 0.1); color: #EC4899; }
+        
+        .report-card .report-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .report-card .report-desc {
+            font-size: 0.85rem;
+            color: #6B7280;
+        }
+        
+        .report-card .report-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1F2937;
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .report-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            min-height: 400px;
+        }
+        
+        .report-container .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .report-container .report-title-section h5 {
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+        
+        .report-container .report-title-section small {
+            color: #6B7280;
+        }
+        
+        .report-actions .btn {
+            border-radius: 8px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .report-table-container {
+            overflow-x: auto;
+        }
+        
+        .report-table-container .table {
+            min-width: 600px;
+        }
+        
+        .report-table-container .table th {
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f8fafc;
+        }
+        
+        .report-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .report-summary .summary-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .report-summary .summary-item .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .report-summary .summary-item .label {
+            font-size: 0.7rem;
+            color: #6B7280;
+            text-transform: uppercase;
+        }
+        
+        .chart-container {
+            height: 250px;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Report Type Selector */
+        .report-type-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .report-type-selector .btn {
+            border-radius: 50px;
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+        }
+        
+        .report-type-selector .btn.active {
+            background: #4F46E5;
+            color: #fff;
+            border-color: #4F46E5;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+            
+            .report-container .report-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .report-actions {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .report-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Reports</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-file-alt me-2 text-primary"></i>Reports
+                    </h3>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Report Cards -->
+                <div class="row g-4 mb-4" id="reportCards">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card report-card" onclick="loadReport('enrollment')">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="report-icon blue me-3">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <div>
+                                        <div class="report-title">Enrollment Report</div>
+                                        <div class="report-desc">Course enrollment statistics</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="report-count" id="enrollmentCount">0</span>
+                                    <span class="badge bg-primary">View</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card report-card" onclick="loadReport('attendance')">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="report-icon green me-3">
+                                        <i class="fas fa-clipboard-check"></i>
+                                    </div>
+                                    <div>
+                                        <div class="report-title">Attendance Report</div>
+                                        <div class="report-desc">Session attendance tracking</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="report-count" id="attendanceCount">0</span>
+                                    <span class="badge bg-success">View</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card report-card" onclick="loadReport('assessment')">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="report-icon orange me-3">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                    <div>
+                                        <div class="report-title">Assessment Report</div>
+                                        <div class="report-desc">Assessment results summary</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="report-count" id="assessmentCount">0</span>
+                                    <span class="badge bg-warning">View</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card report-card" onclick="loadReport('revenue')">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="report-icon purple me-3">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </div>
+                                    <div>
+                                        <div class="report-title">Revenue Report</div>
+                                        <div class="report-desc">Financial revenue summary</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="report-count" id="revenueCount">ETB 0</span>
+                                    <span class="badge bg-info">View</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card report-card" onclick="loadReport('certificate')">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="report-icon pink me-3">
+                                        <i class="fas fa-certificate"></i>
+                                    </div>
+                                    <div>
+                                        <div class="report-title">Certificate Report</div>
+                                        <div class="report-desc">Certificate issuance summary</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="report-count" id="certificateCount">0</span>
+                                    <span class="badge bg-danger">View</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card report-card" onclick="loadReport('instructor')">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="report-icon red me-3">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                    </div>
+                                    <div>
+                                        <div class="report-title">Instructor Report</div>
+                                        <div class="report-desc">Instructor workload summary</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="report-count" id="instructorCount">0</span>
+                                    <span class="badge bg-secondary">View</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Container -->
+                <div class="report-container" id="reportContainer">
+                    <div class="report-header">
+                        <div class="report-title-section">
+                            <h5 id="reportTitle">Select a Report</h5>
+                            <small id="reportSubtitle">Click on any report card above to view detailed data</small>
+                        </div>
+                        <div class="report-actions" id="reportActions" style="display: none;">
+                            <button class="btn btn-outline-primary" onclick="exportPDF()">
+                                <i class="fas fa-file-pdf me-1"></i>PDF
+                            </button>
+                            <button class="btn btn-outline-success" onclick="exportExcel()">
+                                <i class="fas fa-file-excel me-1"></i>Excel
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="printReport()">
+                                <i class="fas fa-print me-1"></i>Print
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Report Type Selector -->
+                    <div class="report-type-selector" id="reportTypeSelector" style="display: none;">
+                        <button class="btn btn-outline-primary active" data-type="summary" onclick="switchReportType('summary')">
+                            <i class="fas fa-chart-pie me-1"></i>Summary
+                        </button>
+                        <button class="btn btn-outline-primary" data-type="details" onclick="switchReportType('details')">
+                            <i class="fas fa-table me-1"></i>Details
+                        </button>
+                        <button class="btn btn-outline-primary" data-type="chart" onclick="switchReportType('chart')">
+                            <i class="fas fa-chart-bar me-1"></i>Chart
+                        </button>
+                    </div>
+                    
+                    <!-- Report Content -->
+                    <div id="reportContent">
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-file-alt fa-4x d-block mb-3 opacity-50"></i>
+                            <h5>No Report Selected</h5>
+                            <p class="small">Click on any report card above to generate a report</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+
+    <!-- Export libraries (Excel + PDF) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="../js/export-utils.js"></script>
+    <script src="../js/reports-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let currentReportType = 'enrollment';
+        let currentViewType = 'summary';
+        let reportChart = null;
+        let reportData = {};
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load report counts
+            loadReportCounts();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Report Counts
+        // ============================================
+        async function loadReportCounts() {
+            try {
+                // Get enrollment count
+                const enrollmentResult = await apiCall('/enrollments?page=1&per_page=1');
+                document.getElementById('enrollmentCount').textContent = enrollmentResult.total || 0;
+                
+                // Get attendance count
+                const attendanceResult = await apiCall('/attendance?page=1&per_page=1');
+                document.getElementById('attendanceCount').textContent = attendanceResult.total || 0;
+                
+                // Get assessment count
+                const assessmentResult = await apiCall('/assessments?page=1&per_page=1');
+                document.getElementById('assessmentCount').textContent = assessmentResult.total || 0;
+                
+                // Get revenue
+                const revenueResult = await apiCall('/dashboard/stats');
+                const totalRevenue = revenueResult.data?.total_revenue || 0;
+                document.getElementById('revenueCount').textContent = `ETB ${totalRevenue.toLocaleString()}`;
+                
+                // Get certificate count
+                const certResult = await apiCall('/certificates?page=1&per_page=1');
+                document.getElementById('certificateCount').textContent = certResult.total || 0;
+                
+                // Get instructor count
+                const instructorResult = await apiCall('/instructors?page=1&per_page=1');
+                document.getElementById('instructorCount').textContent = instructorResult.total || 0;
+                
+            } catch (error) {
+                console.error('Failed to load report counts:', error);
+            }
+        }
+        
+        // ============================================
+        // Load Report
+        // ============================================
+        async function loadReport(type) {
+            currentReportType = type;
+            showLoading();
+            
+            const titles = {
+                enrollment: 'Enrollment Report',
+                attendance: 'Attendance Report',
+                assessment: 'Assessment Report',
+                revenue: 'Revenue Report',
+                certificate: 'Certificate Report',
+                instructor: 'Instructor Report'
+            };
+            
+            const subtitles = {
+                enrollment: 'Detailed course enrollment statistics and trends',
+                attendance: 'Comprehensive attendance tracking and analysis',
+                assessment: 'Assessment results and performance summary',
+                revenue: 'Financial revenue overview and analysis',
+                certificate: 'Certificate issuance and verification summary',
+                instructor: 'Instructor workload and course assignment report'
+            };
+            
+            document.getElementById('reportTitle').textContent = titles[type] || 'Report';
+            document.getElementById('reportSubtitle').textContent = subtitles[type] || '';
+            document.getElementById('reportActions').style.display = 'flex';
+            document.getElementById('reportTypeSelector').style.display = 'flex';
+            
+            try {
+                let data;
+                
+                switch(type) {
+                    case 'enrollment':
+                        data = await getEnrollmentReport();
+                        break;
+                    case 'attendance':
+                        data = await getAttendanceReport();
+                        break;
+                    case 'assessment':
+                        data = await getAssessmentReport();
+                        break;
+                    case 'revenue':
+                        data = await getRevenueReport();
+                        break;
+                    case 'certificate':
+                        data = await getCertificateReport();
+                        break;
+                    case 'instructor':
+                        data = await getInstructorReport();
+                        break;
+                    default:
+                        data = {};
+                }
+                
+                reportData = data;
+                renderReport(currentViewType);
+                
+            } catch (error) {
+                showToast('Failed to load report: ' + error.message, 'error');
+                document.getElementById('reportContent').innerHTML = `
+                    <div class="text-center py-5 text-danger">
+                        <i class="fas fa-exclamation-circle fa-3x d-block mb-2"></i>
+                        <p>Failed to load report data</p>
+                        <button class="btn btn-sm btn-primary" onclick="loadReport('${type}')">
+                            <i class="fas fa-sync-alt me-1"></i>Retry
+                        </button>
+                    </div>
+                `;
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Report Data Functions
+        // ============================================
+        async function getEnrollmentReport() {
+            const result = await apiCall('/reports/course-enrollment');
+            if (result) { result.details = result.data; }
+            return result || {};
+        }
+        
+        async function getAttendanceReport() {
+            const result = await apiCall('/reports/attendance');
+            if (result) { result.details = result.data; }
+            return result || {};
+        }
+        
+        async function getAssessmentReport() {
+            const result = await apiCall('/reports/assessment-results');
+            if (result) { result.details = result.data; }
+            return result || {};
+        }
+        
+        async function getRevenueReport() {
+            const result = await apiCall('/reports/payment-status');
+            if (result) { result.details = result.data; }
+            return result || {};
+        }
+        
+        async function getCertificateReport() {
+            const result = await apiCall('/reports/certificates');
+            if (result) { result.details = result.data; }
+            return result || {};
+        }
+        
+        async function getInstructorReport() {
+            const result = await apiCall('/reports/instructor-workload');
+            if (result) { result.details = result.data; }
+            return result || {};
+        }
+        
+        // ============================================
+        // Render Report
+        // ============================================
+        function renderReport(viewType) {
+            currentViewType = viewType;
+            
+            switch(viewType) {
+                case 'summary':
+                    renderSummary();
+                    break;
+                case 'details':
+                    renderDetails();
+                    break;
+                case 'chart':
+                    renderChart();
+                    break;
+            }
+            
+            // Update active button
+            document.querySelectorAll('.report-type-selector .btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === viewType);
+            });
+        }
+        
+        // ============================================
+        // Render Summary
+        // ============================================
+        function renderSummary() {
+            const content = document.getElementById('reportContent');
+            
+            if (!reportData || Object.keys(reportData).length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <p>No summary data available</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let summaryHtml = '';
+            let chartHtml = '';
+            
+            // Build summary cards
+            if (reportData.summary) {
+                const items = Object.entries(reportData.summary);
+                if (items.length > 0) {
+                    summaryHtml = `
+                        <div class="report-summary">
+                            ${items.map(([key, value]) => `
+                                <div class="summary-item">
+                                    <div class="value">${value}</div>
+                                    <div class="label">${key.replace(/_/g, ' ')}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            }
+            
+            // Build charts
+            if (reportData.charts && reportData.charts.length > 0) {
+                chartHtml = reportData.charts.map((chart, index) => `
+                    <div class="mt-4">
+                        <h6>${chart.title || 'Chart'}</h6>
+                        <div class="chart-container">
+                            <canvas id="reportChart_${index}"></canvas>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            content.innerHTML = `
+                ${summaryHtml}
+                ${chartHtml}
+                ${!summaryHtml && !chartHtml ? `
+                    <div class="text-center py-4 text-muted">
+                        <p>No summary data available for this report</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            // Initialize charts
+            if (reportData.charts) {
+                reportData.charts.forEach((chart, index) => {
+                    const ctx = document.getElementById(`reportChart_${index}`);
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: chart.type || 'bar',
+                            data: {
+                                labels: chart.labels || [],
+                                datasets: [{
+                                    label: chart.dataset_label || 'Data',
+                                    data: chart.data || [],
+                                    backgroundColor: chart.colors || ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#7C3AED'],
+                                    borderColor: '#4F46E5',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: { boxWidth: 12, fontSize: 10 }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+        
+        // ============================================
+        // Render Details
+        // ============================================
+        function renderDetails() {
+            const content = document.getElementById('reportContent');
+            
+            if (!reportData.details || reportData.details.length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <p>No detailed data available</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Get columns from first row
+            const columns = Object.keys(reportData.details[0]);
+            
+            let tableHtml = `
+                <div class="report-table-container">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                ${columns.map(col => `<th>${col.replace(/_/g, ' ').toUpperCase()}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${reportData.details.map(row => `
+                                <tr>
+                                    ${columns.map(col => `<td>${row[col] || '-'}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            content.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <small class="text-muted">${reportData.details.length} records found</small>
+                    <span class="badge bg-primary">${reportData.details.length}</span>
+                </div>
+                ${tableHtml}
+            `;
+        }
+        
+        // ============================================
+        // Render Chart
+        // ============================================
+        function renderChart() {
+            const content = document.getElementById('reportContent');
+            
+            if (!reportData.charts || reportData.charts.length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <p>No chart data available</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let chartHtml = reportData.charts.map((chart, index) => `
+                <div class="mb-4">
+                    <h6>${chart.title || 'Chart'}</h6>
+                    <div class="chart-container">
+                        <canvas id="reportChartDetail_${index}"></canvas>
+                    </div>
+                </div>
+            `).join('');
+            
+            content.innerHTML = chartHtml;
+            
+            // Initialize charts
+            reportData.charts.forEach((chart, index) => {
+                const ctx = document.getElementById(`reportChartDetail_${index}`);
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: chart.type || 'bar',
+                        data: {
+                            labels: chart.labels || [],
+                            datasets: chart.datasets || [{
+                                label: chart.dataset_label || 'Data',
+                                data: chart.data || [],
+                                backgroundColor: chart.colors || ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#7C3AED']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { boxWidth: 12, fontSize: 10 }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        
+        // ============================================
+        // Switch Report Type
+        // ============================================
+        function switchReportType(type) {
+            renderReport(type);
+        }
+        
+        // ============================================
+        // Export Functions
+        // ============================================
+        function exportPDF() {
+            if (!reportData.details || reportData.details.length === 0) {
+                showToast('No detailed data available to export', 'warning');
+                return;
+            }
+            const columns = Object.keys(reportData.details[0]).map(key => ({
+                key,
+                label: key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+            }));
+            const title = document.getElementById('reportTitle').textContent || 'Report';
+            exportArrayToPDF(reportData.details, columns, currentReportType + '-report', title);
+        }
+
+        function exportExcel() {
+            if (!reportData.details || reportData.details.length === 0) {
+                showToast('No detailed data available to export', 'warning');
+                return;
+            }
+            const columns = Object.keys(reportData.details[0]).map(key => ({
+                key,
+                label: key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+            }));
+            const title = document.getElementById('reportTitle').textContent || 'Report';
+            exportArrayToExcel(reportData.details, columns, currentReportType + '-report', title.slice(0, 31));
+        }
+        
+        function printReport() {
+            window.print();
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            }
+        }
+        
+        console.log('📊 Reports page loaded successfully');
+        console.log('🔗 API Integration: api.js + reports-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

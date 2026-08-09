@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Settings Specific Styles */
+        .settings-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .settings-section .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .settings-section .section-header .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-right: 1rem;
+        }
+        
+        .settings-section .section-header .section-icon.primary { background: rgba(79,70,229,0.1); color: #4F46E5; }
+        .settings-section .section-header .section-icon.success { background: rgba(16,185,129,0.1); color: #10B981; }
+        .settings-section .section-header .section-icon.warning { background: rgba(245,158,11,0.1); color: #F59E0B; }
+        .settings-section .section-header .section-icon.danger { background: rgba(239,68,68,0.1); color: #EF4444; }
+        .settings-section .section-header .section-icon.info { background: rgba(59,130,246,0.1); color: #3B82F6; }
+        .settings-section .section-header .section-icon.purple { background: rgba(124,58,237,0.1); color: #7C3AED; }
+        
+        .settings-section .section-header .section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+        
+        .settings-section .section-header .section-subtitle {
+            font-size: 0.85rem;
+            color: #6B7280;
+        }
+        
+        .logo-preview {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-preview:hover {
+            border-color: #4F46E5;
+            background: rgba(79,70,229,0.04);
+        }
+        
+        .logo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 0.5rem;
+        }
+        
+        .logo-preview .upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            cursor: pointer;
+        }
+        
+        .logo-preview:hover .upload-overlay {
+            opacity: 1;
+        }
+        
+        /* Theme Selector */
+        .theme-selector {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .theme-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        
+        .theme-option:hover {
+            border-color: #4F46E5;
+            transform: scale(1.05);
+        }
+        
+        .theme-option.active {
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
+        }
+        
+        .theme-option .theme-colors {
+            display: flex;
+            gap: 2px;
+            justify-content: center;
+            margin-bottom: 0.25rem;
+        }
+        
+        .theme-option .theme-colors .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .theme-option .theme-name {
+            font-size: 0.6rem;
+            color: #6B7280;
+        }
+        
+        /* Certificate Template Preview */
+        .template-preview {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .template-preview .template-icon {
+            font-size: 3rem;
+            color: #9CA3AF;
+            margin-bottom: 0.5rem;
+        }
+        
+        .template-preview .template-name {
+            font-weight: 600;
+        }
+        
+        .template-preview .template-desc {
+            font-size: 0.85rem;
+            color: #6B7280;
+        }
+        
+        /* Password Strength */
+        .password-strength {
+            height: 4px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .password-strength .bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .password-strength .bar.weak { width: 25%; background: #EF4444; }
+        .password-strength .bar.medium { width: 50%; background: #F59E0B; }
+        .password-strength .bar.strong { width: 75%; background: #3B82F6; }
+        .password-strength .bar.very-strong { width: 100%; background: #10B981; }
+        
+        .password-hint {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-top: 0.25rem;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            display: inline-block;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #d1d5db;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+        
+        .toggle-switch .slider:before {
+            content: '';
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: #fff;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        .toggle-switch input:checked + .slider {
+            background: #4F46E5;
+        }
+        
+        .toggle-switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .settings-section {
+                padding: 1rem;
+            }
+            
+            .theme-selector {
+                justify-content: center;
+            }
+            
+            .logo-preview {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Settings</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-cog me-2 text-primary"></i>Settings
+                    </h3>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Settings Sections -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Institution Settings -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <div class="section-icon primary">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div>
+                                    <h6 class="section-title">Institution Settings</h6>
+                                    <div class="section-subtitle">Configure your institution details</div>
+                                </div>
+                            </div>
+                            <form id="institutionForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Institution Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="institutionName" 
+                                                   value="Short-Term Training Institution" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Institution Code</label>
+                                            <input type="text" class="form-control" id="institutionCode" 
+                                                   value="STTI">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="institutionAddress" 
+                                                   value="Addis Ababa, Ethiopia">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Phone</label>
+                                            <input type="tel" class="form-control" id="institutionPhone" 
+                                                   value="+251-911-234567">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="institutionEmail" 
+                                                   value="info@sttims.com">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Save Institution Settings
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Logo Settings -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <div class="section-icon success">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div>
+                                    <h6 class="section-title">Logo & Branding</h6>
+                                    <div class="section-subtitle">Upload your institution logo</div>
+                                </div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-md-4 text-center">
+                                    <div class="logo-preview" id="logoPreview" onclick="document.getElementById('logoInput').click()">
+                                        <img id="logoImage" src="https://ui-avatars.com/api/?name=STTIMS&background=4F46E5&color=fff&size=120" alt="Logo">
+                                        <div class="upload-overlay">
+                                            <i class="fas fa-camera fa-2x"></i>
+                                        </div>
+                                        <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="uploadLogo(event)">
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Click to upload logo (PNG, JPG, JPEG)</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label class="form-label">Logo Preview</label>
+                                        <div class="form-text">Recommended size: 200x200px. Max file size: 2MB.</div>
+                                        <div class="mt-2">
+                                            <button class="btn btn-outline-danger btn-sm" onclick="removeLogo()">
+                                                <i class="fas fa-trash me-1"></i>Remove Logo
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Theme Settings -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <div class="section-icon warning">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <div>
+                                    <h6 class="section-title">Theme Settings</h6>
+                                    <div class="section-subtitle">Choose your preferred theme</div>
+                                </div>
+                            </div>
+                            <div class="theme-selector" id="themeSelector">
+                                <div class="theme-option active" data-theme="default" onclick="selectTheme('default')">
+                                    <div class="theme-colors">
+                                        <span class="color-dot" style="background:#4F46E5;"></span>
+                                        <span class="color-dot" style="background:#7C3AED;"></span>
+                                        <span class="color-dot" style="background:#1F2937;"></span>
+                                    </div>
+                                    <div class="theme-name">Default</div>
+                                </div>
+                                <div class="theme-option" data-theme="dark" onclick="selectTheme('dark')">
+                                    <div class="theme-colors">
+                                        <span class="color-dot" style="background:#1F2937;"></span>
+                                        <span class="color-dot" style="background:#374151;"></span>
+                                        <span class="color-dot" style="background:#6B7280;"></span>
+                                    </div>
+                                    <div class="theme-name">Dark</div>
+                                </div>
+                                <div class="theme-option" data-theme="light" onclick="selectTheme('light')">
+                                    <div class="theme-colors">
+                                        <span class="color-dot" style="background:#F9FAFB;"></span>
+                                        <span class="color-dot" style="background:#E5E7EB;"></span>
+                                        <span class="color-dot" style="background:#1F2937;"></span>
+                                    </div>
+                                    <div class="theme-name">Light</div>
+                                </div>
+                                <div class="theme-option" data-theme="blue" onclick="selectTheme('blue')">
+                                    <div class="theme-colors">
+                                        <span class="color-dot" style="background:#1E40AF;"></span>
+                                        <span class="color-dot" style="background:#3B82F6;"></span>
+                                        <span class="color-dot" style="background:#93C5FD;"></span>
+                                    </div>
+                                    <div class="theme-name">Blue</div>
+                                </div>
+                                <div class="theme-option" data-theme="green" onclick="selectTheme('green')">
+                                    <div class="theme-colors">
+                                        <span class="color-dot" style="background:#065F46;"></span>
+                                        <span class="color-dot" style="background:#10B981;"></span>
+                                        <span class="color-dot" style="background:#6EE7B7;"></span>
+                                    </div>
+                                    <div class="theme-name">Green</div>
+                                </div>
+                                <div class="theme-option" data-theme="purple" onclick="selectTheme('purple')">
+                                    <div class="theme-colors">
+                                        <span class="color-dot" style="background:#4C1D95;"></span>
+                                        <span class="color-dot" style="background:#7C3AED;"></span>
+                                        <span class="color-dot" style="background:#A78BFA;"></span>
+                                    </div>
+                                    <div class="theme-name">Purple</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <!-- Certificate Template -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <div class="section-icon purple">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div>
+                                    <h6 class="section-title">Certificate Template</h6>
+                                    <div class="section-subtitle">Default certificate design</div>
+                                </div>
+                            </div>
+                            <div class="template-preview" id="templatePreview">
+                                <div class="template-icon">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div class="template-name">Professional Certificate</div>
+                                <div class="template-desc">Default certificate template</div>
+                            </div>
+                            <div class="mt-3">
+                                <select class="form-select" id="certificateTemplate" onchange="updateTemplatePreview()">
+                                    <option value="professional">Professional</option>
+                                    <option value="modern">Modern</option>
+                                    <option value="classic">Classic</option>
+                                    <option value="executive">Executive</option>
+                                    <option value="minimal">Minimal</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm mt-2 w-100" onclick="previewTemplate()">
+                                <i class="fas fa-eye me-1"></i>Preview Template
+                            </button>
+                        </div>
+
+                        <!-- Email Settings -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <div class="section-icon info">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h6 class="section-title">Email Settings</h6>
+                                    <div class="section-subtitle">Configure email notifications</div>
+                                </div>
+                            </div>
+                            <form id="emailSettingsForm">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">SMTP Server</label>
+                                    <input type="text" class="form-control" id="smtpServer" value="smtp.gmail.com">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">SMTP Port</label>
+                                    <input type="number" class="form-control" id="smtpPort" value="587">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="emailAddress" value="noreply@sttims.com">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="emailPassword" placeholder="Enter email password">
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Enable email notifications
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-save me-1"></i>Save Email Settings
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Password Settings -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <div class="section-icon danger">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <div>
+                                    <h6 class="section-title">Password Settings</h6>
+                                    <div class="section-subtitle">Change your password</div>
+                                </div>
+                            </div>
+                            <form id="passwordForm">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Current Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="currentPassword" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">New Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="newPassword" required 
+                                           oninput="validatePasswordStrength()">
+                                    <div class="password-strength">
+                                        <div class="bar" id="passwordStrengthBar"></div>
+                                    </div>
+                                    <div class="password-hint" id="passwordStrengthText">
+                                        Password must be at least 8 characters
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Confirm New Password <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control" id="confirmPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fas fa-key me-1"></i>Change Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- Template Preview Modal -->
+    <div class="modal fade" id="templatePreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-certificate me-2 text-primary"></i>Certificate Template Preview
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="templatePreviewBody">
+                    <!-- Template preview will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" onclick="applyTemplate()">
+                        <i class="fas fa-check me-1"></i>Apply Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+    <script src="../js/settings-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        const templatePreviewModal = new bootstrap.Modal(document.getElementById('templatePreviewModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load settings
+            loadSettings();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Institution form
+            document.getElementById('institutionForm').addEventListener('submit', saveInstitutionSettings);
+            
+            // Email settings form
+            document.getElementById('emailSettingsForm').addEventListener('submit', saveEmailSettings);
+            
+            // Password form
+            document.getElementById('passwordForm').addEventListener('submit', changePassword);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Settings
+        // ============================================
+        async function loadSettings() {
+            try {
+                const result = await apiCall('/settings');
+                const settings = result.data || {};
+                
+                // Institution settings
+                if (settings.institution) {
+                    document.getElementById('institutionName').value = settings.institution.name || 'Short-Term Training Institution';
+                    document.getElementById('institutionCode').value = settings.institution.code || 'STTI';
+                    document.getElementById('institutionAddress').value = settings.institution.address || 'Addis Ababa, Ethiopia';
+                    document.getElementById('institutionPhone').value = settings.institution.phone || '+251-911-234567';
+                    document.getElementById('institutionEmail').value = settings.institution.email || 'info@sttims.com';
+                }
+                
+                // Logo
+                if (settings.logo) {
+                    document.getElementById('logoImage').src = settings.logo;
+                }
+                
+                // Theme
+                if (settings.theme) {
+                    selectTheme(settings.theme);
+                }
+                
+                // Certificate template
+                if (settings.certificate_template) {
+                    document.getElementById('certificateTemplate').value = settings.certificate_template;
+                    updateTemplatePreview();
+                }
+                
+                // Email settings
+                if (settings.email) {
+                    document.getElementById('smtpServer').value = settings.email.smtp_server || 'smtp.gmail.com';
+                    document.getElementById('smtpPort').value = settings.email.smtp_port || 587;
+                    document.getElementById('emailAddress').value = settings.email.address || 'noreply@sttims.com';
+                    document.getElementById('emailNotifications').checked = settings.email.notifications_enabled !== false;
+                }
+                
+            } catch (error) {
+                showToast('Failed to load settings: ' + error.message, 'error');
+            }
+        }
+        
+        // ============================================
+        // Save Institution Settings
+        // ============================================
+        async function saveInstitutionSettings(e) {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('institutionName').value.trim(),
+                code: document.getElementById('institutionCode').value.trim(),
+                address: document.getElementById('institutionAddress').value.trim(),
+                phone: document.getElementById('institutionPhone').value.trim(),
+                email: document.getElementById('institutionEmail').value.trim()
+            };
+            
+            try {
+                showLoading();
+                await apiCall('/settings/institution', 'PUT', data);
+                showToast('Institution settings saved successfully!', 'success');
+            } catch (error) {
+                showToast('Failed to save institution settings: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Upload Logo
+        // ============================================
+        async function uploadLogo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showToast('Please upload an image file', 'warning');
+                return;
+            }
+            
+            // Validate file size (2MB max)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('File size must be less than 2MB', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                const formData = new FormData();
+                formData.append('logo', file);
+                
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${API_BASE_URL}/settings/logo`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to upload logo');
+                }
+                
+                const result = await response.json();
+                
+                if (result.data && result.data.logo_url) {
+                    document.getElementById('logoImage').src = result.data.logo_url;
+                    showToast('Logo uploaded successfully!', 'success');
+                }
+                
+            } catch (error) {
+                showToast('Failed to upload logo: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Remove Logo
+        // ============================================
+        async function removeLogo() {
+            if (!confirm('Are you sure you want to remove the logo?')) return;
+            
+            try {
+                showLoading();
+                await apiCall('/settings/logo', 'DELETE');
+                document.getElementById('logoImage').src = 'https://ui-avatars.com/api/?name=STTIMS&background=4F46E5&color=fff&size=120';
+                showToast('Logo removed successfully!', 'success');
+            } catch (error) {
+                showToast('Failed to remove logo: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Select Theme
+        // ============================================
+        async function selectTheme(theme) {
+            // Update UI
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.theme === theme);
+            });
+            
+            // Apply theme to page
+            applyTheme(theme);
+            
+            // Save to server
+            try {
+                await apiCall('/settings/theme', 'PUT', { theme: theme });
+            } catch (error) {
+                console.error('Failed to save theme:', error);
+            }
+        }
+        
+        function applyTheme(theme) {
+            const navbars = document.querySelectorAll('.navbar');
+            const sidebar = document.querySelector('.sidebar');
+            
+            // Remove all theme classes
+            document.body.className = document.body.className
+                .split(' ')
+                .filter(c => !c.startsWith('theme-'))
+                .join(' ');
+            
+            switch(theme) {
+                case 'dark':
+                    document.body.classList.add('theme-dark');
+                    document.body.style.background = '#1a1a2e';
+                    document.body.style.color = '#e5e7eb';
+                    navbars.forEach(n => n.classList.add('navbar-dark'));
+                    if (sidebar) sidebar.style.background = '#16213e';
+                    break;
+                case 'light':
+                    document.body.classList.add('theme-light');
+                    document.body.style.background = '#f3f4f6';
+                    document.body.style.color = '#1F2937';
+                    navbars.forEach(n => n.classList.remove('navbar-dark'));
+                    if (sidebar) sidebar.style.background = '#ffffff';
+                    break;
+                case 'blue':
+                    document.body.classList.add('theme-blue');
+                    document.body.style.background = '#eff6ff';
+                    document.body.style.color = '#1e293b';
+                    break;
+                case 'green':
+                    document.body.classList.add('theme-green');
+                    document.body.style.background = '#f0fdf4';
+                    document.body.style.color = '#064e3b';
+                    break;
+                case 'purple':
+                    document.body.classList.add('theme-purple');
+                    document.body.style.background = '#f5f3ff';
+                    document.body.style.color = '#3b0764';
+                    break;
+                default:
+                    document.body.style.background = '';
+                    document.body.style.color = '';
+                    break;
+            }
+        }
+        
+        // ============================================
+        // Save Email Settings
+        // ============================================
+        async function saveEmailSettings(e) {
+            e.preventDefault();
+            
+            const data = {
+                smtp_server: document.getElementById('smtpServer').value.trim(),
+                smtp_port: parseInt(document.getElementById('smtpPort').value) || 587,
+                address: document.getElementById('emailAddress').value.trim(),
+                password: document.getElementById('emailPassword').value || undefined,
+                notifications_enabled: document.getElementById('emailNotifications').checked
+            };
+            
+            try {
+                showLoading();
+                await apiCall('/settings/email', 'PUT', data);
+                showToast('Email settings saved successfully!', 'success');
+                document.getElementById('emailPassword').value = '';
+            } catch (error) {
+                showToast('Failed to save email settings: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Change Password
+        // ============================================
+        async function changePassword(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showToast('Please fill in all password fields', 'warning');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                showToast('New password must be at least 8 characters', 'warning');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showToast('Passwords do not match', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                await apiCall('/auth/change-password', 'POST', {
+                    current_password: currentPassword,
+                    new_password: newPassword
+                });
+                
+                showToast('Password changed successfully!', 'success');
+                document.getElementById('passwordForm').reset();
+                document.getElementById('passwordStrengthBar').className = 'bar';
+                document.getElementById('passwordStrengthText').textContent = 'Password must be at least 8 characters';
+                
+            } catch (error) {
+                showToast('Failed to change password: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Password Strength Validation
+        // ============================================
+        function validatePasswordStrength() {
+            const password = document.getElementById('newPassword').value;
+            const bar = document.getElementById('passwordStrengthBar');
+            const text = document.getElementById('passwordStrengthText');
+            
+            if (!password) {
+                bar.className = 'bar';
+                text.textContent = 'Password must be at least 8 characters';
+                return;
+            }
+            
+            let strength = 0;
+            let level = 'weak';
+            let message = 'Weak password';
+            
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 10;
+            if (/[a-z]/.test(password)) strength += 20;
+            if (/[A-Z]/.test(password)) strength += 20;
+            if (/[0-9]/.test(password)) strength += 15;
+            if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
+            
+            if (strength >= 80) { level = 'very-strong'; message = 'Very strong password!'; }
+            else if (strength >= 60) { level = 'strong'; message = 'Strong password'; }
+            else if (strength >= 40) { level = 'medium'; message = 'Medium strength password'; }
+            else { level = 'weak'; message = 'Weak password - add more characters, numbers, and symbols'; }
+            
+            bar.className = `bar ${level}`;
+            text.textContent = message;
+        }
+        
+        // ============================================
+        // Certificate Template Functions
+        // ============================================
+        function updateTemplatePreview() {
+            const template = document.getElementById('certificateTemplate').value;
+            const preview = document.getElementById('templatePreview');
+            const names = {
+                professional: 'Professional Certificate',
+                modern: 'Modern Certificate',
+                classic: 'Classic Certificate',
+                executive: 'Executive Certificate',
+                minimal: 'Minimal Certificate'
+            };
+            const descs = {
+                professional: 'Traditional and elegant design',
+                modern: 'Clean and contemporary layout',
+                classic: 'Timeless and formal style',
+                executive: 'Premium and prestigious look',
+                minimal: 'Simple and clean aesthetic'
+            };
+            
+            preview.querySelector('.template-name').textContent = names[template] || 'Professional Certificate';
+            preview.querySelector('.template-desc').textContent = descs[template] || 'Default certificate template';
+        }
+        
+        function previewTemplate() {
+            const template = document.getElementById('certificateTemplate').value;
+            const body = document.getElementById('templatePreviewBody');
+            
+            const templates = {
+                professional: `
+                    <div class="certificate-preview">
+                        <div class="cert-border" style="border:3px double #4F46E5;padding:3rem;text-align:center;background:#fff;border-radius:8px;">
+                            <h3 style="font-size:1.75rem;font-weight:700;color:#1F2937;letter-spacing:2px;">CERTIFICATE OF COMPLETION</h3>
+                            <hr style="width:100px;margin:1rem auto;border:2px solid #4F46E5;">
+                            <p style="font-size:1rem;color:#4B5563;">This certificate is presented to</p>
+                            <h4 style="font-size:1.5rem;font-weight:700;color:#4F46E5;margin:0.5rem 0;">[Trainee Name]</h4>
+                            <p style="font-size:1rem;color:#4B5563;">for successfully completing the course</p>
+                            <h5 style="font-size:1.1rem;font-weight:600;color:#1F2937;">[Course Name]</h5>
+                            <div style="display:flex;justify-content:center;gap:3rem;margin-top:2rem;">
+                                <div style="text-align:center;">
+                                    <div style="width:120px;height:2px;background:#1F2937;margin:0.5rem auto;"></div>
+                                    <div style="font-weight:600;font-size:0.9rem;">Instructor</div>
+                                    <div style="font-size:0.7rem;color:#6B7280;">Course Instructor</div>
+                                </div>
+                                <div style="text-align:center;">
+                                    <div style="width:120px;height:2px;background:#1F2937;margin:0.5rem auto;"></div>
+                                    <div style="font-weight:600;font-size:0.9rem;">Director</div>
+                                    <div style="font-size:0.7rem;color:#6B7280;">Training Director</div>
+                                </div>
+                            </div>
+                            <div style="margin-top:1.5rem;font-size:0.7rem;color:#9CA3AF;">Certificate Number: [Certificate Number]</div>
+                        </div>
+                    </div>
+                `,
+                modern: `
+                    <div class="certificate-preview">
+                        <div class="cert-border" style="border:3px solid #10B981;padding:3rem;text-align:center;background:linear-gradient(135deg,#f0fdf4,#ffffff);border-radius:8px;">
+                            <div style="width:60px;height:60px;background:#10B981;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;margin-bottom:1rem;">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <h3 style="font-size:1.75rem;font-weight:700;color:#065F46;letter-spacing:2px;">CERTIFICATE</h3>
+                            <p style="color:#6B7280;">This certifies that</p>
+                            <h4 style="font-size:1.5rem;font-weight:700;color:#10B981;">[Trainee Name]</h4>
+                            <p style="color:#6B7280;">has successfully completed</p>
+                            <h5 style="font-size:1.1rem;font-weight:600;color:#065F46;">[Course Name]</h5>
+                            <div style="display:flex;justify-content:center;gap:3rem;margin-top:2rem;">
+                                <div style="text-align:center;"><div style="width:120px;height:2px;background:#065F46;margin:0.5rem auto;"></div><div style="font-weight:600;">Instructor</div></div>
+                                <div style="text-align:center;"><div style="width:120px;height:2px;background:#065F46;margin:0.5rem auto;"></div><div style="font-weight:600;">Director</div></div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                classic: `
+                    <div class="certificate-preview">
+                        <div class="cert-border" style="border:3px double #8B4513;padding:3rem;text-align:center;background:#fdf8f0;border-radius:8px;">
+                            <div style="font-size:2rem;color:#8B4513;">📜</div>
+                            <h3 style="font-size:1.75rem;font-weight:700;color:#5D4037;letter-spacing:2px;font-family:serif;">Certificate of Completion</h3>
+                            <p style="color:#6B7280;">This is to certify that</p>
+                            <h4 style="font-size:1.5rem;font-weight:700;color:#5D4037;margin:0.5rem 0;font-family:serif;">[Trainee Name]</h4>
+                            <p style="color:#6B7280;">has successfully completed the course</p>
+                            <h5 style="font-size:1.1rem;font-weight:600;color:#5D4037;">[Course Name]</h5>
+                            <div style="display:flex;justify-content:center;gap:3rem;margin-top:2rem;">
+                                <div style="text-align:center;"><div style="width:120px;height:2px;background:#5D4037;margin:0.5rem auto;"></div><div style="font-weight:600;">Instructor</div></div>
+                                <div style="text-align:center;"><div style="width:120px;height:2px;background:#5D4037;margin:0.5rem auto;"></div><div style="font-weight:600;">Director</div></div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                executive: `
+                    <div class="certificate-preview">
+                        <div class="cert-border" style="border:3px solid #1F2937;padding:3rem;text-align:center;background:#f8fafc;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                            <div style="width:60px;height:60px;background:#1F2937;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;margin-bottom:1rem;">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <h3 style="font-size:1.75rem;font-weight:700;color:#1F2937;letter-spacing:3px;">EXECUTIVE CERTIFICATE</h3>
+                            <hr style="width:100px;margin:1rem auto;border:2px solid #1F2937;">
+                            <p style="color:#6B7280;">Presented to</p>
+                            <h4 style="font-size:1.5rem;font-weight:700;color:#1F2937;">[Trainee Name]</h4>
+                            <p style="color:#6B7280;">For completion of</p>
+                            <h5 style="font-size:1.1rem;font-weight:600;color:#1F2937;">[Course Name]</h5>
+                            <div style="display:flex;justify-content:center;gap:3rem;margin-top:2rem;">
+                                <div style="text-align:center;"><div style="width:120px;height:2px;background:#1F2937;margin:0.5rem auto;"></div><div style="font-weight:600;">Instructor</div></div>
+                                <div style="text-align:center;"><div style="width:120px;height:2px;background:#1F2937;margin:0.5rem auto;"></div><div style="font-weight:600;">Director</div></div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                minimal: `
+                    <div class="certificate-preview">
+                        <div class="cert-border" style="border:2px solid #e5e7eb;padding:3rem;text-align:center;background:#ffffff;border-radius:8px;">
+                            <h3 style="font-size:1.5rem;font-weight:300;color:#1F2937;letter-spacing:4px;">CERTIFICATE</h3>
+                            <hr style="width:50px;margin:1rem auto;border:1px solid #4F46E5;">
+                            <p style="color:#6B7280;font-size:0.9rem;">This certifies that</p>
+                            <h4 style="font-size:1.5rem;font-weight:400;color:#1F2937;">[Trainee Name]</h4>
+                            <p style="color:#6B7280;font-size:0.9rem;">has completed</p>
+                            <h5 style="font-size:1rem;font-weight:400;color:#1F2937;">[Course Name]</h5>
+                            <div style="display:flex;justify-content:center;gap:3rem;margin-top:2rem;">
+                                <div style="text-align:center;"><div style="width:100px;height:1px;background:#d1d5db;margin:0.5rem auto;"></div><div style="font-weight:400;font-size:0.8rem;">Instructor</div></div>
+                                <div style="text-align:center;"><div style="width:100px;height:1px;background:#d1d5db;margin:0.5rem auto;"></div><div style="font-weight:400;font-size:0.8rem;">Director</div></div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            };
+            
+            body.innerHTML = templates[template] || templates.professional;
+            templatePreviewModal.show();
+        }
+        
+        function applyTemplate() {
+            const template = document.getElementById('certificateTemplate').value;
+            
+            // Save template preference
+            apiCall('/settings/certificate-template', 'PUT', { template: template })
+                .then(() => {
+                    showToast('Certificate template applied successfully!', 'success');
+                    templatePreviewModal.hide();
+                })
+                .catch(error => {
+                    showToast('Failed to apply template: ' + error.message, 'error');
+                });
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            }
+        }
+        
+        console.log('⚙️ Settings page loaded successfully');
+        console.log('🔗 API Integration: api.js + settings-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

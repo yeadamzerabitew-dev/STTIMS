@@ -1,0 +1,11 @@
+    def check_password(self, password):
+        """
+        Check if the provided password matches the stored hash.
+        """
+        if not self.password_hash:
+            return False
+        try:
+            return check_password_hash(self.password_hash, password)
+        except (ValueError, TypeError):
+            # Malformed/legacy hash (e.g. placeholder seed data) - treat as no match
+            return False

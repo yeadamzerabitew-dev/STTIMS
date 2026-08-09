@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Management - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Instructor Specific Styles */
+        .instructor-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .instructor-avatar-placeholder {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10B981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .instructor-code {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #6B7280;
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            background: #DBEAFE;
+            color: #1E40AF;
+            padding: 0.15rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin: 0.1rem 0.2rem;
+        }
+        
+        .skill-tag.primary {
+            background: #4F46E5;
+            color: #fff;
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .table-container .table {
+            min-width: 1000px;
+        }
+        
+        /* Form Styles */
+        .form-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #10B981;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .form-section {
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .image-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .image-upload:hover {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.04);
+        }
+        
+        .image-upload .preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            display: none;
+        }
+        
+        .image-upload .preview.show {
+            display: block;
+        }
+        
+        .image-upload .upload-icon {
+            font-size: 3rem;
+            color: #9CA3AF;
+            margin-bottom: 0.5rem;
+        }
+        
+        .image-upload .upload-text {
+            color: #6B7280;
+            font-size: 0.875rem;
+        }
+        
+        .image-upload .upload-text strong {
+            color: #10B981;
+        }
+        
+        /* Skills Management */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            min-height: 50px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+        }
+        
+        .skill-item {
+            display: inline-flex;
+            align-items: center;
+            background: #DBEAFE;
+            color: #1E40AF;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .skill-item .remove-skill {
+            cursor: pointer;
+            margin-left: 0.4rem;
+            color: #EF4444;
+            font-size: 0.7rem;
+        }
+        
+        .skill-item .remove-skill:hover {
+            color: #DC2626;
+        }
+        
+        .skill-item.primary-skill {
+            background: #4F46E5;
+            color: #fff;
+        }
+        
+        .skill-item.primary-skill .remove-skill {
+            color: #FCA5A5;
+        }
+        
+        .skill-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .skill-input-group .form-control {
+            flex: 1;
+        }
+        
+        .skill-input-group .btn {
+            white-space: nowrap;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.active { background: #D1FAE5; color: #065F46; }
+        .status-badge.inactive { background: #FEE2E2; color: #991B1B; }
+        .status-badge.on-leave { background: #FEF3C7; color: #92400E; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Instructor Management</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-chalkboard-teacher me-2 text-primary"></i>Instructor Management
+                    </h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="openAddInstructorModal()">
+                            <i class="fas fa-user-plus me-1"></i>Add Instructor
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput" 
+                                       placeholder="Search by name, code, email..." oninput="filterInstructors()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Department</label>
+                            <select class="form-select" id="departmentFilter" onchange="filterInstructors()">
+                                <option value="">All Departments</option>
+                                <option value="IT">IT</option>
+                                <option value="Electrical">Electrical</option>
+                                <option value="Mechanical">Mechanical</option>
+                                <option value="Software">Software</option>
+                                <option value="Business">Business</option>
+                                <option value="Data">Data</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterInstructors()">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="On Leave">On Leave</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-outline-secondary btn-sm me-1" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-export me-1"></i>Export
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataExcel(); return false;"><i class="fas fa-file-excel me-2 text-success"></i>Export to Excel</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataPDF(); return false;"><i class="fas fa-file-pdf me-2 text-danger"></i>Export to PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructors Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Instructors List
+                            <span class="badge bg-primary ms-2" id="instructorCount">0</span>
+                        </h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadInstructors()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table table-striped table-hover mb-0" id="instructorsTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 60px;">Photo</th>
+                                        <th>Code</th>
+                                        <th>Full Name</th>
+                                        <th>Department</th>
+                                        <th>Experience</th>
+                                        <th>Status</th>
+                                        <th style="width: 120px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="instructorsTableBody">
+                                    <!-- Instructors loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="text-muted small" id="tableInfo">Showing 0 of 0 instructors</span>
+                        <nav id="paginationContainer"></nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- Add/Edit Instructor Modal -->
+    <div class="modal fade" id="addInstructorModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2 text-primary"></i>
+                        <span id="instructorModalTitle">Add New Instructor</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="instructorForm" novalidate>
+                        <input type="hidden" id="editInstructorId">
+                        
+                        <!-- Image Upload -->
+                        <div class="form-section">
+                            <div class="image-upload" id="imageUpload" onclick="document.getElementById('profileImage').click()">
+                                <img id="imagePreview" class="preview" alt="Profile">
+                                <div id="imagePlaceholder">
+                                    <div class="upload-icon"><i class="fas fa-camera"></i></div>
+                                    <p class="upload-text">
+                                        <strong>Click to upload</strong> or drag and drop<br>
+                                        <small>PNG, JPG, JPEG (Max 5MB)</small>
+                                    </p>
+                                </div>
+                                <input type="file" id="profileImage" accept="image/*" style="display:none" onchange="previewImage(event)">
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-user me-2"></i>Personal Information</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="firstName" required>
+                                        <div class="invalid-feedback">First name is required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control" id="middleName">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="lastName" required>
+                                        <div class="invalid-feedback">Last name is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="gender" required>
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a gender</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="dateOfBirth" required>
+                                        <div class="invalid-feedback">Date of birth is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-address-book me-2"></i>Contact Information</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="email" required>
+                                        <div class="invalid-feedback">Please enter a valid email</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="phone" required>
+                                        <div class="invalid-feedback">Please enter a valid phone number</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="address">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">City</label>
+                                        <input type="text" class="form-control" id="city">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-briefcase me-2"></i>Professional Information</h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Qualification <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="qualification" rows="2" required></textarea>
+                                        <div class="invalid-feedback">Qualification is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Department <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="department" required>
+                                            <option value="">Select Department</option>
+                                            <option value="IT">Information Technology</option>
+                                            <option value="Electrical">Electrical Engineering</option>
+                                            <option value="Mechanical">Mechanical Engineering</option>
+                                            <option value="Software">Software Engineering</option>
+                                            <option value="Business">Business Management</option>
+                                            <option value="Data">Data Science</option>
+                                            <option value="Civil">Civil Engineering</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a department</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Years of Experience <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="experience" min="0" required>
+                                        <div class="invalid-feedback">Experience is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Employment Type <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="employmentType" required>
+                                            <option value="">Select Type</option>
+                                            <option value="Full Time">Full Time</option>
+                                            <option value="Part Time">Part Time</option>
+                                            <option value="Contract">Contract</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select employment type</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Joining Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="joiningDate" required>
+                                        <div class="invalid-feedback">Joining date is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Bio / About</label>
+                                        <textarea class="form-control" id="bio" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skills Management -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-tools me-2"></i>Skills & Specializations</h6>
+                            <div class="form-group">
+                                <label class="form-label">Skills</label>
+                                <div class="skills-container" id="skillsContainer">
+                                    <!-- Skills will be added here -->
+                                </div>
+                                <div class="skill-input-group">
+                                    <input type="text" class="form-control" id="skillInput" placeholder="Enter skill name">
+                                    <select class="form-select" id="skillProficiency" style="width: 130px;">
+                                        <option value="Beginner">Beginner</option>
+                                        <option value="Intermediate">Intermediate</option>
+                                        <option value="Advanced" selected>Advanced</option>
+                                        <option value="Expert">Expert</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary" onclick="addSkill()">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Press Enter or click Add to add a skill. Click the star to mark as primary.</div>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="instructorStatus">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                        <option value="On Leave">On Leave</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" id="saveInstructorBtn">
+                        <i class="fas fa-save me-1"></i>Save Instructor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Instructor Modal -->
+    <div class="modal fade" id="viewInstructorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user me-2 text-primary"></i>Instructor Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewInstructorBody">
+                    <!-- Instructor details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+
+    <!-- Export libraries (Excel + PDF) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="../js/export-utils.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let currentPage = 1;
+        let totalPages = 1;
+        let perPage = 10;
+        let instructorsData = [];
+        let deleteInstructorId = null;
+        let editInstructorId = null;
+        let skills = [];
+        let primarySkillIndex = -1;
+        
+        const instructorModal = new bootstrap.Modal(document.getElementById('addInstructorModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewInstructorModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load instructors
+            loadInstructors();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Save instructor button
+            document.getElementById('saveInstructorBtn').addEventListener('click', saveInstructor);
+            
+            // Confirm button
+            document.getElementById('confirmBtn').addEventListener('click', confirmDelete);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+            
+            // Skill input Enter key
+            document.getElementById('skillInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addSkill();
+                }
+            });
+        }
+        
+        // ============================================
+        // Load Instructors
+        // ============================================
+        async function loadInstructors(page = 1) {
+            showLoading();
+            currentPage = page;
+            
+            const search = document.getElementById('searchInput').value;
+            const department = document.getElementById('departmentFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: perPage,
+                    search: search,
+                    department: department,
+                    status: status
+                });
+                
+                const result = await apiCall(`/instructors?${params.toString()}`);
+                
+                instructorsData = result.data || [];
+                totalPages = result.total_pages || 1;
+                
+                renderTable(instructorsData);
+                renderPagination();
+                updateTableInfo(result.total || 0);
+                
+            } catch (error) {
+                showToast('Failed to load instructors: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Render Table
+        // ============================================
+        function renderTable(instructors) {
+            const tbody = document.getElementById('instructorsTableBody');
+            const count = document.getElementById('instructorCount');
+            
+            count.textContent = instructors.length;
+            
+            if (!instructors || instructors.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-chalkboard-teacher fa-2x d-block mb-2"></i>
+                            No instructors found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = instructors.map((instructor, index) => `
+                <tr>
+                    <td>
+                        ${instructor.profile_image ? 
+                            `<img src="${instructor.profile_image}" class="instructor-avatar" alt="Profile">` :
+                            `<div class="instructor-avatar-placeholder">${(instructor.first_name || '?').charAt(0).toUpperCase()}</div>`
+                        }
+                    </td>
+                    <td><span class="instructor-code">${instructor.instructor_code || '-'}</span></td>
+                    <td>
+                        <div class="fw-bold">${instructor.first_name || ''} ${instructor.middle_name || ''} ${instructor.last_name || ''}</div>
+                        <small class="text-muted">${instructor.qualification ? instructor.qualification.substring(0, 30) + '...' : ''}</small>
+                    </td>
+                    <td>${instructor.department || '-'}</td>
+                    <td>${instructor.years_of_experience || 0} years</td>
+                    <td>
+                        <span class="status-badge ${(instructor.status || 'inactive').toLowerCase().replace(' ', '-')}">
+                            ${instructor.status || 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-info" onclick="viewInstructor(${instructor.instructor_id})" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="editInstructor(${instructor.instructor_id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="openDeleteModal(${instructor.instructor_id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // ============================================
+        // Render Pagination
+        // ============================================
+        function renderPagination() {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `<ul class="pagination pagination-sm mb-0">`;
+            
+            html += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadInstructors(${currentPage - 1})">«</a>
+                </li>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadInstructors(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadInstructors(${currentPage + 1})">»</a>
+                </li>
+            `;
+            
+            html += `</ul>`;
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // Update Table Info
+        // ============================================
+        function updateTableInfo(total) {
+            const start = (currentPage - 1) * perPage + 1;
+            const end = Math.min(start + perPage - 1, total);
+            document.getElementById('tableInfo').textContent = 
+                `Showing ${total > 0 ? start : 0} to ${end} of ${total} instructors`;
+        }
+        
+        // ============================================
+        // Filter Functions
+        // ============================================
+        function filterInstructors() {
+            loadInstructors(1);
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('departmentFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            loadInstructors(1);
+        }
+        
+        function refreshTable() {
+            loadInstructors(currentPage);
+        }
+        
+        // ============================================
+        // Export Data
+        // ============================================
+        function exportDataExcel() {
+            const columns = [
+                { key: 'instructor_code', label: 'Code' },
+                { key: 'full_name', label: 'Full Name' },
+                { key: 'email', label: 'Email' },
+                { key: 'phone_number', label: 'Phone' },
+                { key: 'department', label: 'Department' },
+                { key: 'employment_type', label: 'Employment Type' },
+                { key: 'years_of_experience', label: 'Years Experience' },
+                { key: 'status', label: 'Status' },
+                { key: 'joining_date', label: 'Joining Date' }
+            ];
+            exportArrayToExcel(instructorsData, columns, 'instructors', 'Instructors');
+        }
+
+        function exportDataPDF() {
+            const columns = [
+                { key: 'instructor_code', label: 'Code' },
+                { key: 'full_name', label: 'Full Name' },
+                { key: 'email', label: 'Email' },
+                { key: 'phone_number', label: 'Phone' },
+                { key: 'department', label: 'Department' },
+                { key: 'employment_type', label: 'Employment Type' },
+                { key: 'years_of_experience', label: 'Years Experience' },
+                { key: 'status', label: 'Status' },
+                { key: 'joining_date', label: 'Joining Date' }
+            ];
+            exportArrayToPDF(instructorsData, columns, 'instructors', 'Instructors Report');
+        }
+        
+        // ============================================
+        // Image Preview
+        // ============================================
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    const placeholder = document.getElementById('imagePlaceholder');
+                    preview.src = e.target.result;
+                    preview.classList.add('show');
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // ============================================
+        // Skills Management
+        // ============================================
+        function addSkill() {
+            const input = document.getElementById('skillInput');
+            const proficiency = document.getElementById('skillProficiency');
+            const skillName = input.value.trim();
+            
+            if (!skillName) {
+                showToast('Please enter a skill name', 'warning');
+                return;
+            }
+            
+            // Check duplicate
+            if (skills.some(s => s.name.toLowerCase() === skillName.toLowerCase())) {
+                showToast('Skill already exists', 'warning');
+                return;
+            }
+            
+            skills.push({
+                name: skillName,
+                proficiency: proficiency.value,
+                is_primary: false
+            });
+            
+            input.value = '';
+            renderSkills();
+        }
+        
+        function removeSkill(index) {
+            skills.splice(index, 1);
+            if (primarySkillIndex >= skills.length) {
+                primarySkillIndex = -1;
+            } else if (primarySkillIndex === index) {
+                primarySkillIndex = -1;
+            }
+            renderSkills();
+        }
+        
+        function setPrimarySkill(index) {
+            primarySkillIndex = index;
+            skills.forEach((s, i) => {
+                s.is_primary = (i === index);
+            });
+            renderSkills();
+        }
+        
+        function renderSkills() {
+            const container = document.getElementById('skillsContainer');
+            
+            if (skills.length === 0) {
+                container.innerHTML = `
+                    <div class="text-muted" style="width:100%;text-align:center;padding:0.5rem;">
+                        <small>No skills added yet</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = skills.map((skill, index) => `
+                <span class="skill-item ${skill.is_primary ? 'primary-skill' : ''}">
+                    ${skill.name}
+                    <span class="text-muted ms-1" style="font-size:0.65rem;">
+                        (${skill.proficiency})
+                    </span>
+                    ${index !== primarySkillIndex ? `
+                        <span class="remove-skill" onclick="setPrimarySkill(${index})" title="Mark as primary">
+                            <i class="fas fa-star"></i>
+                        </span>
+                    ` : `
+                        <span class="remove-skill" style="color:#FCA5A5;" title="Primary skill">
+                            <i class="fas fa-star"></i>
+                        </span>
+                    `}
+                    <span class="remove-skill" onclick="removeSkill(${index})" title="Remove skill">
+                        <i class="fas fa-times"></i>
+                    </span>
+                </span>
+            `).join('');
+        }
+        
+        // ============================================
+        // Open Add Instructor Modal
+        // ============================================
+        function openAddInstructorModal() {
+            editInstructorId = null;
+            document.getElementById('instructorModalTitle').textContent = 'Add New Instructor';
+            document.getElementById('editInstructorId').value = '';
+            document.getElementById('instructorForm').reset();
+            document.getElementById('imagePreview').classList.remove('show');
+            document.getElementById('imagePlaceholder').style.display = 'block';
+            document.getElementById('instructorStatus').value = 'Active';
+            skills = [];
+            primarySkillIndex = -1;
+            renderSkills();
+            instructorModal.show();
+        }
+        
+        // ============================================
+        // Edit Instructor
+        // ============================================
+        async function editInstructor(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/instructors/${id}`);
+                const instructor = result.data;
+                
+                editInstructorId = id;
+                document.getElementById('instructorModalTitle').textContent = 'Edit Instructor';
+                document.getElementById('editInstructorId').value = id;
+                
+                // Personal Info
+                document.getElementById('firstName').value = instructor.first_name || '';
+                document.getElementById('middleName').value = instructor.middle_name || '';
+                document.getElementById('lastName').value = instructor.last_name || '';
+                document.getElementById('gender').value = instructor.gender || '';
+                document.getElementById('dateOfBirth').value = instructor.date_of_birth || '';
+                
+                // Contact Info
+                document.getElementById('email').value = instructor.email || '';
+                document.getElementById('phone').value = instructor.phone_number || '';
+                document.getElementById('address').value = instructor.address || '';
+                document.getElementById('city').value = instructor.city || '';
+                
+                // Professional Info
+                document.getElementById('qualification').value = instructor.qualification || '';
+                document.getElementById('department').value = instructor.department || '';
+                document.getElementById('experience').value = instructor.years_of_experience || 0;
+                document.getElementById('employmentType').value = instructor.employment_type || '';
+                document.getElementById('joiningDate').value = instructor.joining_date || '';
+                document.getElementById('bio').value = instructor.bio || '';
+                
+                // Status
+                document.getElementById('instructorStatus').value = instructor.status || 'Active';
+                
+                // Profile Image
+                if (instructor.profile_image) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = instructor.profile_image;
+                    preview.classList.add('show');
+                    document.getElementById('imagePlaceholder').style.display = 'none';
+                }
+                
+                // Skills
+                if (instructor.skills && instructor.skills.length > 0) {
+                    skills = instructor.skills.map(s => ({
+                        name: s.skill_name,
+                        proficiency: s.proficiency_level || 'Advanced',
+                        is_primary: s.is_primary_skill || false
+                    }));
+                    
+                    const primaryIndex = skills.findIndex(s => s.is_primary);
+                    primarySkillIndex = primaryIndex >= 0 ? primaryIndex : -1;
+                    
+                    renderSkills();
+                } else {
+                    skills = [];
+                    primarySkillIndex = -1;
+                    renderSkills();
+                }
+                
+                instructorModal.show();
+            } catch (error) {
+                showToast('Failed to load instructor data: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Save Instructor
+        // ============================================
+        async function saveInstructor() {
+            const id = document.getElementById('editInstructorId').value;
+            
+            // Collect form data
+            const data = {
+                first_name: document.getElementById('firstName').value.trim(),
+                middle_name: document.getElementById('middleName').value.trim(),
+                last_name: document.getElementById('lastName').value.trim(),
+                gender: document.getElementById('gender').value,
+                date_of_birth: document.getElementById('dateOfBirth').value,
+                email: document.getElementById('email').value.trim(),
+                phone_number: document.getElementById('phone').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                qualification: document.getElementById('qualification').value.trim(),
+                department: document.getElementById('department').value,
+                years_of_experience: parseInt(document.getElementById('experience').value) || 0,
+                employment_type: document.getElementById('employmentType').value,
+                joining_date: document.getElementById('joiningDate').value,
+                bio: document.getElementById('bio').value.trim(),
+                status: document.getElementById('instructorStatus').value,
+                skills: skills.map(s => ({
+                    skill_name: s.name,
+                    proficiency_level: s.proficiency,
+                    is_primary_skill: s.is_primary || false
+                }))
+            };
+            
+            // Validate
+            if (!data.first_name || !data.last_name || !data.email || !data.phone_number) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+            
+            if (!data.gender || !data.date_of_birth || !data.qualification) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+            
+            if (!data.department || !data.employment_type || !data.joining_date) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                let result;
+                if (id) {
+                    result = await apiCall(`/instructors/${id}`, 'PUT', data);
+                    showToast('Instructor updated successfully!', 'success');
+                } else {
+                    result = await apiCall('/instructors', 'POST', data);
+                    showToast('Instructor created successfully!', 'success');
+                }
+                
+                instructorModal.hide();
+                loadInstructors(currentPage);
+                
+            } catch (error) {
+                showToast('Failed to save instructor: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // View Instructor
+        // ============================================
+        async function viewInstructor(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/instructors/${id}`);
+                const instructor = result.data;
+                
+                const skillHtml = instructor.skills && instructor.skills.length > 0
+                    ? instructor.skills.map(s => `
+                        <span class="skill-tag ${s.is_primary_skill ? 'primary' : ''}">
+                            ${s.skill_name} (${s.proficiency_level || 'N/A'})
+                            ${s.is_primary_skill ? '⭐' : ''}
+                        </span>
+                    `).join('')
+                    : 'No skills listed';
+                
+                document.getElementById('viewInstructorBody').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            ${instructor.profile_image ? 
+                                `<img src="${instructor.profile_image}" class="img-fluid rounded-circle" style="width:150px;height:150px;object-fit:cover;border:3px solid #e5e7eb;">` :
+                                `<div class="instructor-avatar-placeholder mx-auto" style="width:150px;height:150px;font-size:3rem;">${(instructor.first_name || '?').charAt(0).toUpperCase()}</div>`
+                            }
+                            <h6 class="mt-3">${instructor.first_name || ''} ${instructor.middle_name || ''} ${instructor.last_name || ''}</h6>
+                            <span class="instructor-code">${instructor.instructor_code || '-'}</span>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-6"><strong>Email:</strong> ${instructor.email || '-'}</div>
+                                <div class="col-6"><strong>Phone:</strong> ${instructor.phone_number || '-'}</div>
+                                <div class="col-6"><strong>Gender:</strong> ${instructor.gender || '-'}</div>
+                                <div class="col-6"><strong>DOB:</strong> ${instructor.date_of_birth || '-'}</div>
+                                <div class="col-6"><strong>Department:</strong> ${instructor.department || '-'}</div>
+                                <div class="col-6"><strong>Experience:</strong> ${instructor.years_of_experience || 0} years</div>
+                                <div class="col-6"><strong>Employment:</strong> ${instructor.employment_type || '-'}</div>
+                                <div class="col-6"><strong>Status:</strong> 
+                                    <span class="status-badge ${(instructor.status || 'inactive').toLowerCase().replace(' ', '-')}">
+                                        ${instructor.status || 'Inactive'}
+                                    </span>
+                                </div>
+                                <div class="col-12 mt-2"><strong>Qualification:</strong> ${instructor.qualification || '-'}</div>
+                                ${instructor.bio ? `<div class="col-12 mt-2"><strong>Bio:</strong> ${instructor.bio}</div>` : ''}
+                                <div class="col-12 mt-2"><strong>Skills:</strong> ${skillHtml}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                viewModal.show();
+            } catch (error) {
+                showToast('Failed to load instructor details', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Delete Modal
+        // ============================================
+        function openDeleteModal(id) {
+            deleteInstructorId = id;
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to delete this instructor? This action cannot be undone.';
+            confirmModal.show();
+        }
+        
+        // ============================================
+        // Confirm Delete
+        // ============================================
+        async function confirmDelete() {
+            if (!deleteInstructorId) return;
+            
+            try {
+                showLoading();
+                await apiCall(`/instructors/${deleteInstructorId}`, 'DELETE');
+                showToast('Instructor deleted successfully!', 'success');
+                confirmModal.hide();
+                loadInstructors(currentPage);
+            } catch (error) {
+                showToast('Failed to delete instructor: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                deleteInstructorId = null;
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+            confirmModal.show();
+            
+            document.getElementById('confirmBtn').onclick = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            };
+        }
+        
+        console.log('👨‍🏫 Instructor Management page loaded successfully');
+        console.log('🔗 API Integration: api.js + instructors-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>	

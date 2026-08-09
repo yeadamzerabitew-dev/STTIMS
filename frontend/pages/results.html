@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results Management - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Results Specific Styles */
+        .result-header {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .result-header .form-control,
+        .result-header .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .result-table-container {
+            overflow-x: auto;
+        }
+        
+        .result-table-container .table {
+            min-width: 800px;
+        }
+        
+        .result-table-container .table th {
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .trainee-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #fff;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            flex-shrink: 0;
+        }
+        
+        .marks-input {
+            max-width: 100px;
+        }
+        
+        .grade-badge {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            min-width: 40px;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .grade-badge.A { background: #D1FAE5; color: #065F46; }
+        .grade-badge.A- { background: #D1FAE5; color: #065F46; }
+        .grade-badge.B { background: #DBEAFE; color: #1E40AF; }
+        .grade-badge.B- { background: #DBEAFE; color: #1E40AF; }
+        .grade-badge.B- { background: #DBEAFE; color: #1E40AF; }
+        .grade-badge.C { background: #FEF3C7; color: #92400E; }
+        .grade-badge.C- { background: #FEF3C7; color: #92400E; }
+        .grade-badge.C- { background: #FEF3C7; color: #92400E; }
+        .grade-badge.D { background: #FCE4EC; color: #880E4F; }
+        .grade-badge.F { background: #FEE2E2; color: #991B1B; }
+        .grade-badge['Not Attempted'] { background: #F3F4F6; color: #6B7280; }
+        
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        .status-badge.pass { background: #D1FAE5; color: #065F46; }
+        .status-badge.fail { background: #FEE2E2; color: #991B1B; }
+        .status-badge.not-attempted { background: #F3F4F6; color: #6B7280; }
+        
+        .summary-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .summary-card .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .summary-card .label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-card .number.pass { color: #10B981; }
+        .summary-card .number.fail { color: #EF4444; }
+        .summary-card .number.pending { color: #F59E0B; }
+        
+        /* Grade Scale Reference */
+        .grade-scale-ref {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.75rem;
+        }
+        
+        .grade-scale-ref .grade-item {
+            display: inline-block;
+            margin: 0 0.25rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .result-header .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .result-header .row > div:last-child {
+                margin-bottom: 0;
+            }
+            
+            .marks-input {
+                max-width: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Results Management</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>Results Management
+                    </h3>
+                    <div>
+                        <button class="btn btn-success" id="saveResultsBtn">
+                            <i class="fas fa-save me-1"></i>Save Results
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Results Header -->
+                <div class="result-header">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label small text-muted">Select Assessment</label>
+                            <select class="form-select" id="assessmentSelect" onchange="loadTrainees()">
+                                <option value="">Select Assessment</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Batch</label>
+                            <input type="text" class="form-control" id="batchDisplay" readonly style="background: #fff;">
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <span class="badge bg-info" id="totalTrainees">0 Trainees</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grade Scale Reference -->
+                <div class="grade-scale-ref mb-3">
+                    <strong class="me-2">Grade Scale:</strong>
+                    <span class="grade-item"><span class="grade-badge A">A</span> 85-100</span>
+                    <span class="grade-item"><span class="grade-badge" style="background:#D1FAE5;color:#065F46;">A-</span> 80-84</span>
+                    <span class="grade-item"><span class="grade-badge B">B+</span> 75-79</span>
+                    <span class="grade-item"><span class="grade-badge B">B</span> 70-74</span>
+                    <span class="grade-item"><span class="grade-badge B">B-</span> 65-69</span>
+                    <span class="grade-item"><span class="grade-badge C">C+</span> 60-64</span>
+                    <span class="grade-item"><span class="grade-badge C">C</span> 55-59</span>
+                    <span class="grade-item"><span class="grade-badge C">C-</span> 50-54</span>
+                    <span class="grade-item"><span class="grade-badge D">D</span> 45-49</span>
+                    <span class="grade-item"><span class="grade-badge F">F</span> 0-44</span>
+                </div>
+
+                <!-- Results Summary -->
+                <div class="row g-3 mb-4" id="summaryRow" style="display: none;">
+                    <div class="col-md-3 col-6">
+                        <div class="summary-card">
+                            <div class="number pass" id="passCount">0</div>
+                            <div class="label">Passed</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-card">
+                            <div class="number fail" id="failCount">0</div>
+                            <div class="label">Failed</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-card">
+                            <div class="number pending" id="pendingCount">0</div>
+                            <div class="label">Not Attempted</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-card">
+                            <div class="number" id="avgMarks" style="color: #4F46E5;">0</div>
+                            <div class="label">Average Marks</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Trainee Results
+                            <span class="badge bg-primary ms-2" id="resultCount">0</span>
+                        </h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary me-1" onclick="autoFillMarks()">
+                                <i class="fas fa-magic"></i> Auto Fill
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="resetAllMarks()">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="result-table-container">
+                            <table class="table table-hover mb-0" id="resultsTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 50px;">#</th>
+                                        <th style="width: 50px;">Photo</th>
+                                        <th>Trainee</th>
+                                        <th>Code</th>
+                                        <th style="width: 120px;">Marks</th>
+                                        <th style="width: 80px;">%</th>
+                                        <th style="width: 60px;">Grade</th>
+                                        <th style="width: 100px;">Status</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultsTableBody">
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4 text-muted">
+                                            <i class="fas fa-chart-bar fa-2x d-block mb-2"></i>
+                                            Select an assessment to load trainees
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Enter marks for each trainee. Grades and status will be calculated automatically.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+    <script src="../js/results-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let assessmentsList = [];
+        let traineesData = [];
+        let resultsData = [];
+        let currentAssessmentId = null;
+        let gradeScale = [];
+        let maxMarks = 0;
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load assessments
+            loadAssessments();
+            
+            // Load grade scale
+            loadGradeScale();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Save results button
+            document.getElementById('saveResultsBtn').addEventListener('click', saveResults);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Assessments
+        // ============================================
+        async function loadAssessments() {
+            try {
+                showLoading();
+                const result = await apiCall('/assessments');
+                assessmentsList = result.data || [];
+                
+                const select = document.getElementById('assessmentSelect');
+                select.innerHTML = '<option value="">Select Assessment</option>' + 
+                    assessmentsList.map(a => `<option value="${a.assessment_id}">${a.title} (${a.assessment_type})</option>`).join('');
+                
+            } catch (error) {
+                showToast('Failed to load assessments: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Load Grade Scale
+        // ============================================
+        async function loadGradeScale() {
+            try {
+                const result = await apiCall('/results/grade-scale');
+                gradeScale = result.data || [];
+            } catch (error) {
+                console.error('Failed to load grade scale:', error);
+                // Fallback grade scale
+                gradeScale = [
+                    { grade_letter: 'A', min_percentage: 85, max_percentage: 100, is_pass: true },
+                    { grade_letter: 'A-', min_percentage: 80, max_percentage: 84, is_pass: true },
+                    { grade_letter: 'B+', min_percentage: 75, max_percentage: 79, is_pass: true },
+                    { grade_letter: 'B', min_percentage: 70, max_percentage: 74, is_pass: true },
+                    { grade_letter: 'B-', min_percentage: 65, max_percentage: 69, is_pass: true },
+                    { grade_letter: 'C+', min_percentage: 60, max_percentage: 64, is_pass: true },
+                    { grade_letter: 'C', min_percentage: 55, max_percentage: 59, is_pass: true },
+                    { grade_letter: 'C-', min_percentage: 50, max_percentage: 54, is_pass: true },
+                    { grade_letter: 'D', min_percentage: 45, max_percentage: 49, is_pass: true },
+                    { grade_letter: 'F', min_percentage: 0, max_percentage: 44, is_pass: false }
+                ];
+            }
+        }
+        
+        // ============================================
+        // Load Trainees for Selected Assessment
+        // ============================================
+        async function loadTrainees() {
+            const assessmentId = document.getElementById('assessmentSelect').value;
+            currentAssessmentId = assessmentId;
+            
+            if (!assessmentId) {
+                document.getElementById('batchDisplay').value = '';
+                document.getElementById('summaryRow').style.display = 'none';
+                document.getElementById('resultsTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            <i class="fas fa-chart-bar fa-2x d-block mb-2"></i>
+                            Select an assessment to load trainees
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('resultCount').textContent = '0';
+                document.getElementById('totalTrainees').textContent = '0 Trainees';
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                // Get assessment details
+                const assessmentResult = await apiCall(`/assessments/${assessmentId}`);
+                const assessment = assessmentResult.data;
+                maxMarks = assessment.max_marks || 0;
+                document.getElementById('batchDisplay').value = assessment.batch_name || 'N/A';
+                
+                // Get results for this assessment
+                const resultsResult = await apiCall(`/results/assessment/${assessmentId}`);
+                const existingResults = resultsResult.data || [];
+                
+                // Get enrolled trainees for the batch
+                const batchId = assessment.batch_id;
+                const enrollmentsResult = await apiCall(`/enrollments?batch_id=${batchId}&per_page=1000`);
+                const enrollments = enrollmentsResult.data || [];
+                
+                // Build results data
+                traineesData = [];
+                resultsData = [];
+                
+                for (const enrollment of enrollments) {
+                    const trainee = {
+                        trainee_id: enrollment.trainee_id,
+                        trainee_code: enrollment.trainee_code,
+                        first_name: (enrollment.trainee_name || '').split(' ')[0] || '',
+                        last_name: (enrollment.trainee_name || '').split(' ').slice(1).join(' ')
+                    };
+                    const existing = existingResults.find(r => r.trainee_id === trainee.trainee_id);
+                    
+                    traineesData.push(trainee);
+                    resultsData.push({
+                        trainee_id: trainee.trainee_id,
+                        marks_obtained: existing ? existing.marks_obtained : null,
+                        percentage: existing ? existing.percentage_score : null,
+                        grade: existing ? existing.grade : null,
+                        status: existing ? existing.status : 'Not Attempted',
+                        feedback: existing ? existing.instructor_feedback : '',
+                        result_id: existing ? existing.result_id : null
+                    });
+                }
+                
+                renderResultsTable();
+                updateSummary();
+                
+            } catch (error) {
+                showToast('Failed to load results: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Render Results Table
+        // ============================================
+        function renderResultsTable() {
+            const tbody = document.getElementById('resultsTableBody');
+            const count = document.getElementById('resultCount');
+            
+            count.textContent = traineesData.length;
+            document.getElementById('totalTrainees').textContent = traineesData.length + ' Trainees';
+            
+            if (!traineesData || traineesData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            <i class="fas fa-users fa-2x d-block mb-2"></i>
+                            No trainees enrolled in this batch
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('summaryRow').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('summaryRow').style.display = 'flex';
+            
+            tbody.innerHTML = traineesData.map((trainee, index) => {
+                const result = resultsData[index];
+                const marks = result.marks_obtained !== null ? result.marks_obtained : '';
+                const percentage = result.percentage !== null ? result.percentage : '';
+                const grade = result.grade || '';
+                const status = result.status || 'Not Attempted';
+                const statusClass = status.toLowerCase().replace(' ', '-');
+                const gradeClass = grade || 'Not Attempted';
+                
+                return `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                            <div class="trainee-avatar">
+                                ${(trainee.first_name || '?').charAt(0).toUpperCase()}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-bold">${trainee.first_name || ''} ${trainee.last_name || ''}</div>
+                        </td>
+                        <td><span class="text-muted small">${trainee.trainee_code || '-'}</span></td>
+                        <td>
+                            <input type="number" class="form-control form-control-sm marks-input" 
+                                   id="marks_${index}" 
+                                   value="${marks}" 
+                                   min="0" max="${maxMarks}"
+                                   oninput="calculateResult(${index})"
+                                   placeholder="Marks">
+                        </td>
+                        <td id="percentage_${index}">${percentage || '-'}</td>
+                        <td>
+                            <span class="grade-badge ${gradeClass}">${grade || '-'}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge ${statusClass}">${status}</span>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" 
+                                   id="feedback_${index}" 
+                                   value="${result.feedback || ''}" 
+                                   placeholder="Feedback">
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // Calculate Result for a Trainee
+        // ============================================
+        function calculateResult(index) {
+            const marksInput = document.getElementById(`marks_${index}`);
+            const percentageDisplay = document.getElementById(`percentage_${index}`);
+            const gradeDisplay = document.getElementById(`grade_display_${index}`);
+            
+            const marks = parseFloat(marksInput.value);
+            
+            if (isNaN(marks) || marks < 0) {
+                resultsData[index].marks_obtained = null;
+                resultsData[index].percentage = null;
+                resultsData[index].grade = null;
+                resultsData[index].status = 'Not Attempted';
+                percentageDisplay.textContent = '-';
+                // Update grade display
+                const row = marksInput.closest('tr');
+                const gradeCell = row.querySelector('.grade-badge');
+                const statusCell = row.querySelector('.status-badge');
+                if (gradeCell) {
+                    gradeCell.textContent = '-';
+                    gradeCell.className = 'grade-badge Not Attempted';
+                }
+                if (statusCell) {
+                    statusCell.textContent = 'Not Attempted';
+                    statusCell.className = 'status-badge not-attempted';
+                }
+                updateSummary();
+                return;
+            }
+            
+            if (marks > maxMarks) {
+                showToast('Marks cannot exceed max marks (' + maxMarks + ')', 'warning');
+                marksInput.value = maxMarks;
+                return;
+            }
+            
+            const percentage = (marks / maxMarks) * 100;
+            const roundedPercentage = Math.round(percentage * 100) / 100;
+            
+            resultsData[index].marks_obtained = marks;
+            resultsData[index].percentage = roundedPercentage;
+            
+            // Find grade
+            let grade = 'F';
+            let status = 'Fail';
+            
+            for (const g of gradeScale) {
+                if (roundedPercentage >= g.min_percentage && roundedPercentage <= g.max_percentage) {
+                    grade = g.grade_letter;
+                    status = g.is_pass ? 'Pass' : 'Fail';
+                    break;
+                }
+            }
+            
+            resultsData[index].grade = grade;
+            resultsData[index].status = status;
+            
+            // Update display
+            percentageDisplay.textContent = roundedPercentage + '%';
+            
+            const row = marksInput.closest('tr');
+            const gradeCell = row.querySelector('.grade-badge');
+            const statusCell = row.querySelector('.status-badge');
+            
+            if (gradeCell) {
+                gradeCell.textContent = grade;
+                gradeCell.className = `grade-badge ${grade}`;
+            }
+            
+            if (statusCell) {
+                statusCell.textContent = status;
+                statusCell.className = `status-badge ${status.toLowerCase()}`;
+            }
+            
+            updateSummary();
+        }
+        
+        // ============================================
+        // Update Summary
+        // ============================================
+        function updateSummary() {
+            let pass = 0;
+            let fail = 0;
+            let notAttempted = 0;
+            let totalMarks = 0;
+            let count = 0;
+            
+            for (const result of resultsData) {
+                if (result.status === 'Pass') {
+                    pass++;
+                    totalMarks += result.marks_obtained || 0;
+                    count++;
+                } else if (result.status === 'Fail') {
+                    fail++;
+                    totalMarks += result.marks_obtained || 0;
+                    count++;
+                } else {
+                    notAttempted++;
+                }
+            }
+            
+            document.getElementById('passCount').textContent = pass;
+            document.getElementById('failCount').textContent = fail;
+            document.getElementById('pendingCount').textContent = notAttempted;
+            
+            const avg = count > 0 ? Math.round(totalMarks / count) : 0;
+            document.getElementById('avgMarks').textContent = avg;
+        }
+        
+        // ============================================
+        // Auto Fill Marks
+        // ============================================
+        function autoFillMarks() {
+            for (let i = 0; i < resultsData.length; i++) {
+                const marksInput = document.getElementById(`marks_${i}`);
+                if (marksInput && !marksInput.value) {
+                    const randomMarks = Math.round(Math.random() * maxMarks);
+                    marksInput.value = randomMarks;
+                    calculateResult(i);
+                }
+            }
+        }
+        
+        // ============================================
+        // Reset All Marks
+        // ============================================
+        function resetAllMarks() {
+            if (!confirm('Are you sure you want to reset all marks?')) return;
+            
+            for (let i = 0; i < resultsData.length; i++) {
+                const marksInput = document.getElementById(`marks_${i}`);
+                if (marksInput) {
+                    marksInput.value = '';
+                    resultsData[i].marks_obtained = null;
+                    resultsData[i].percentage = null;
+                    resultsData[i].grade = null;
+                    resultsData[i].status = 'Not Attempted';
+                    
+                    const row = marksInput.closest('tr');
+                    const percentageDisplay = document.getElementById(`percentage_${i}`);
+                    const gradeCell = row.querySelector('.grade-badge');
+                    const statusCell = row.querySelector('.status-badge');
+                    
+                    if (percentageDisplay) percentageDisplay.textContent = '-';
+                    if (gradeCell) {
+                        gradeCell.textContent = '-';
+                        gradeCell.className = 'grade-badge Not Attempted';
+                    }
+                    if (statusCell) {
+                        statusCell.textContent = 'Not Attempted';
+                        statusCell.className = 'status-badge not-attempted';
+                    }
+                }
+            }
+            
+            updateSummary();
+        }
+        
+        // ============================================
+        // Save Results
+        // ============================================
+        async function saveResults() {
+            if (!currentAssessmentId) {
+                showToast('Please select an assessment first', 'warning');
+                return;
+            }
+            
+            // Get feedback from inputs
+            for (let i = 0; i < resultsData.length; i++) {
+                const feedbackInput = document.getElementById(`feedback_${i}`);
+                if (feedbackInput) {
+                    resultsData[i].feedback = feedbackInput.value;
+                }
+            }
+            
+            // Filter out "Not Attempted" entries
+            const results = resultsData
+                .filter(r => r.status !== 'Not Attempted')
+                .map(r => ({
+                    trainee_id: r.trainee_id,
+                    marks_obtained: r.marks_obtained,
+                    instructor_feedback: r.feedback || ''
+                }));
+            
+            if (results.length === 0) {
+                showToast('No results to save. Please enter marks for at least one trainee.', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                await apiCall(`/results/bulk`, 'POST', {
+                    assessment_id: currentAssessmentId,
+                    results: results
+                });
+                
+                showToast('Results saved successfully!', 'success');
+                
+                // Reload to show saved data
+                await loadTrainees();
+                
+            } catch (error) {
+                showToast('Failed to save results: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            }
+        }
+        
+        console.log('📊 Results Management page loaded successfully');
+        console.log('🔗 API Integration: api.js + results-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<!doctype html>
+<html lang=en>
+<title>Redirecting...</title>
+<h1>Redirecting...</h1>
+<p>You should be redirected automatically to the target URL: <a href="/api/auth/login?next=%2Fapi%2Freports%2Factive-trainees%3Fformat%3Dcsv">/api/auth/login?next=%2Fapi%2Freports%2Factive-trainees%3Fformat%3Dcsv</a>. If not, click the link.

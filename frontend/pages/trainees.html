@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainee Management - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Trainee Specific Styles */
+        .trainee-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .trainee-avatar-placeholder {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .trainee-code {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #6B7280;
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .table-container .table {
+            min-width: 900px;
+        }
+        
+        /* Form Styles */
+        .form-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4F46E5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .form-section {
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .image-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .image-upload:hover {
+            border-color: #4F46E5;
+            background: rgba(79, 70, 229, 0.04);
+        }
+        
+        .image-upload .preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            display: none;
+        }
+        
+        .image-upload .preview.show {
+            display: block;
+        }
+        
+        .image-upload .upload-icon {
+            font-size: 3rem;
+            color: #9CA3AF;
+            margin-bottom: 0.5rem;
+        }
+        
+        .image-upload .upload-text {
+            color: #6B7280;
+            font-size: 0.875rem;
+        }
+        
+        .image-upload .upload-text strong {
+            color: #4F46E5;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.active { background: #D1FAE5; color: #065F46; }
+        .status-badge.inactive { background: #FEE2E2; color: #991B1B; }
+        .status-badge.suspended { background: #FEF3C7; color: #92400E; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Trainee Management</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-user-graduate me-2 text-primary"></i>Trainee Management
+                    </h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="openAddTraineeModal()">
+                            <i class="fas fa-user-plus me-1"></i>Add Trainee
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput" 
+                                       placeholder="Search by name, code, email..." oninput="filterTrainees()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterTrainees()">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Suspended">Suspended</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Gender</label>
+                            <select class="form-select" id="genderFilter" onchange="filterTrainees()">
+                                <option value="">All Genders</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-outline-secondary btn-sm me-1" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-export me-1"></i>Export
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataExcel(); return false;"><i class="fas fa-file-excel me-2 text-success"></i>Export to Excel</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataPDF(); return false;"><i class="fas fa-file-pdf me-2 text-danger"></i>Export to PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trainees Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Trainees List
+                            <span class="badge bg-primary ms-2" id="traineeCount">0</span>
+                        </h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadTrainees()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table table-striped table-hover mb-0" id="traineesTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 60px;">Photo</th>
+                                        <th>Code</th>
+                                        <th>Full Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th style="width: 120px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="traineesTableBody">
+                                    <!-- Trainees loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="text-muted small" id="tableInfo">Showing 0 of 0 trainees</span>
+                        <nav id="paginationContainer"></nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- Add/Edit Trainee Modal -->
+    <div class="modal fade" id="addTraineeModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2 text-primary"></i>
+                        <span id="traineeModalTitle">Add New Trainee</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="traineeForm" novalidate>
+                        <input type="hidden" id="editTraineeId">
+                        
+                        <!-- Image Upload -->
+                        <div class="form-section">
+                            <div class="image-upload" id="imageUpload" onclick="document.getElementById('profileImage').click()">
+                                <img id="imagePreview" class="preview" alt="Profile">
+                                <div id="imagePlaceholder">
+                                    <div class="upload-icon"><i class="fas fa-camera"></i></div>
+                                    <p class="upload-text">
+                                        <strong>Click to upload</strong> or drag and drop<br>
+                                        <small>PNG, JPG, JPEG (Max 5MB)</small>
+                                    </p>
+                                </div>
+                                <input type="file" id="profileImage" accept="image/*" style="display:none" onchange="previewImage(event)">
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-user me-2"></i>Personal Information</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="firstName" required>
+                                        <div class="invalid-feedback">First name is required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Middle Name</label>
+                                        <input type="text" class="form-control" id="middleName">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="lastName" required>
+                                        <div class="invalid-feedback">Last name is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="gender" required>
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a gender</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="dateOfBirth" required>
+                                        <div class="invalid-feedback">Date of birth is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-address-book me-2"></i>Contact Information</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="email" required>
+                                        <div class="invalid-feedback">Please enter a valid email</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="phone" required>
+                                        <div class="invalid-feedback">Please enter a valid phone number</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Alternative Phone</label>
+                                        <input type="tel" class="form-control" id="altPhone">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="address">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">City</label>
+                                        <input type="text" class="form-control" id="city">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Region/State</label>
+                                        <input type="text" class="form-control" id="region">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-graduation-cap me-2"></i>Education & Occupation</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Educational Level <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="educationLevel" required>
+                                            <option value="">Select Level</option>
+                                            <option value="High School">High School</option>
+                                            <option value="Diploma">Diploma</option>
+                                            <option value="BSc">BSc</option>
+                                            <option value="MSc">MSc</option>
+                                            <option value="PhD">PhD</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select educational level</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Occupation</label>
+                                        <input type="text" class="form-control" id="occupation">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Organization</label>
+                                        <input type="text" class="form-control" id="organization">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-phone-alt me-2"></i>Emergency Contact</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Guardian Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="guardianName" required>
+                                        <div class="invalid-feedback">Guardian name is required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Relationship <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="relationship" required>
+                                            <option value="">Select Relationship</option>
+                                            <option value="Father">Father</option>
+                                            <option value="Mother">Mother</option>
+                                            <option value="Spouse">Spouse</option>
+                                            <option value="Sibling">Sibling</option>
+                                            <option value="Friend">Friend</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select relationship</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Guardian Phone <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="guardianPhone" required>
+                                        <div class="invalid-feedback">Guardian phone is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="traineeStatus">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                        <option value="Suspended">Suspended</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" id="saveTraineeBtn">
+                        <i class="fas fa-save me-1"></i>Save Trainee
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Trainee Modal -->
+    <div class="modal fade" id="viewTraineeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user me-2 text-primary"></i>Trainee Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewTraineeBody">
+                    <!-- Trainee details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+
+    <!-- Export libraries (Excel + PDF) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="../js/export-utils.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let currentPage = 1;
+        let totalPages = 1;
+        let perPage = 10;
+        let traineesData = [];
+        let deleteTraineeId = null;
+        let editTraineeId = null;
+        
+        const traineeModal = new bootstrap.Modal(document.getElementById('addTraineeModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewTraineeModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load trainees
+            loadTrainees();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Save trainee button
+            document.getElementById('saveTraineeBtn').addEventListener('click', saveTrainee);
+            
+            // Confirm button
+            document.getElementById('confirmBtn').addEventListener('click', confirmDelete);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Trainees
+        // ============================================
+        async function loadTrainees(page = 1) {
+            showLoading();
+            currentPage = page;
+            
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            const gender = document.getElementById('genderFilter').value;
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: perPage,
+                    search: search,
+                    status: status,
+                    gender: gender
+                });
+                
+                const result = await apiCall(`/trainees?${params.toString()}`);
+                
+                traineesData = result.data || [];
+                totalPages = result.total_pages || 1;
+                
+                renderTable(traineesData);
+                renderPagination();
+                updateTableInfo(result.total || 0);
+                
+            } catch (error) {
+                showToast('Failed to load trainees: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Render Table
+        // ============================================
+        function renderTable(trainees) {
+            const tbody = document.getElementById('traineesTableBody');
+            const count = document.getElementById('traineeCount');
+            
+            count.textContent = trainees.length;
+            
+            if (!trainees || trainees.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-user-graduate fa-2x d-block mb-2"></i>
+                            No trainees found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = trainees.map((trainee, index) => `
+                <tr>
+                    <td>
+                        ${trainee.profile_image ? 
+                            `<img src="${trainee.profile_image}" class="trainee-avatar" alt="Profile">` :
+                            `<div class="trainee-avatar-placeholder">${(trainee.first_name || '?').charAt(0).toUpperCase()}</div>`
+                        }
+                    </td>
+                    <td><span class="trainee-code">${trainee.trainee_code || '-'}</span></td>
+                    <td>
+                        <div class="fw-bold">${trainee.first_name || ''} ${trainee.middle_name || ''} ${trainee.last_name || ''}</div>
+                        <small class="text-muted">${trainee.gender || ''}</small>
+                    </td>
+                    <td>${trainee.email || '-'}</td>
+                    <td>${trainee.phone_number || '-'}</td>
+                    <td>
+                        <span class="status-badge ${(trainee.status || 'inactive').toLowerCase()}">
+                            ${trainee.status || 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-info" onclick="viewTrainee(${trainee.trainee_id})" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="editTrainee(${trainee.trainee_id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="openDeleteModal(${trainee.trainee_id})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // ============================================
+        // Render Pagination
+        // ============================================
+        function renderPagination() {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `<ul class="pagination pagination-sm mb-0">`;
+            
+            html += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadTrainees(${currentPage - 1})">«</a>
+                </li>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadTrainees(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadTrainees(${currentPage + 1})">»</a>
+                </li>
+            `;
+            
+            html += `</ul>`;
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // Update Table Info
+        // ============================================
+        function updateTableInfo(total) {
+            const start = (currentPage - 1) * perPage + 1;
+            const end = Math.min(start + perPage - 1, total);
+            document.getElementById('tableInfo').textContent = 
+                `Showing ${total > 0 ? start : 0} to ${end} of ${total} trainees`;
+        }
+        
+        // ============================================
+        // Filter Functions
+        // ============================================
+        function filterTrainees() {
+            loadTrainees(1);
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('genderFilter').value = '';
+            loadTrainees(1);
+        }
+        
+        function refreshTable() {
+            loadTrainees(currentPage);
+        }
+        
+        // ============================================
+        // Export Data
+        // ============================================
+        function exportDataExcel() {
+            const columns = [
+                { key: 'trainee_code', label: 'Code' },
+                { key: 'full_name', label: 'Full Name' },
+                { key: 'email', label: 'Email' },
+                { key: 'phone_number', label: 'Phone' },
+                { key: 'gender', label: 'Gender' },
+                { key: 'educational_level', label: 'Education Level' },
+                { key: 'occupation', label: 'Occupation' },
+                { key: 'city', label: 'City' },
+                { key: 'status', label: 'Status' },
+                { key: 'registration_date', label: 'Registration Date' }
+            ];
+            exportArrayToExcel(traineesData, columns, 'trainees', 'Trainees');
+        }
+
+        function exportDataPDF() {
+            const columns = [
+                { key: 'trainee_code', label: 'Code' },
+                { key: 'full_name', label: 'Full Name' },
+                { key: 'email', label: 'Email' },
+                { key: 'phone_number', label: 'Phone' },
+                { key: 'gender', label: 'Gender' },
+                { key: 'educational_level', label: 'Education Level' },
+                { key: 'occupation', label: 'Occupation' },
+                { key: 'city', label: 'City' },
+                { key: 'status', label: 'Status' },
+                { key: 'registration_date', label: 'Registration Date' }
+            ];
+            exportArrayToPDF(traineesData, columns, 'trainees', 'Trainees Report');
+        }
+        
+        // ============================================
+        // Image Preview
+        // ============================================
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    const placeholder = document.getElementById('imagePlaceholder');
+                    preview.src = e.target.result;
+                    preview.classList.add('show');
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // ============================================
+        // Open Add Trainee Modal
+        // ============================================
+        function openAddTraineeModal() {
+            editTraineeId = null;
+            document.getElementById('traineeModalTitle').textContent = 'Add New Trainee';
+            document.getElementById('editTraineeId').value = '';
+            document.getElementById('traineeForm').reset();
+            document.getElementById('imagePreview').classList.remove('show');
+            document.getElementById('imagePlaceholder').style.display = 'block';
+            document.getElementById('traineeStatus').value = 'Active';
+            traineeModal.show();
+        }
+        
+        // ============================================
+        // Edit Trainee
+        // ============================================
+        async function editTrainee(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/trainees/${id}`);
+                const trainee = result.data;
+                
+                editTraineeId = id;
+                document.getElementById('traineeModalTitle').textContent = 'Edit Trainee';
+                document.getElementById('editTraineeId').value = id;
+                
+                // Personal Info
+                document.getElementById('firstName').value = trainee.first_name || '';
+                document.getElementById('middleName').value = trainee.middle_name || '';
+                document.getElementById('lastName').value = trainee.last_name || '';
+                document.getElementById('gender').value = trainee.gender || '';
+                document.getElementById('dateOfBirth').value = trainee.date_of_birth || '';
+                
+                // Contact Info
+                document.getElementById('email').value = trainee.email || '';
+                document.getElementById('phone').value = trainee.phone_number || '';
+                document.getElementById('altPhone').value = trainee.alternative_phone || '';
+                document.getElementById('address').value = trainee.address || '';
+                document.getElementById('city').value = trainee.city || '';
+                document.getElementById('region').value = trainee.state_region || '';
+                
+                // Education
+                document.getElementById('educationLevel').value = trainee.educational_level || '';
+                document.getElementById('occupation').value = trainee.occupation || '';
+                document.getElementById('organization').value = trainee.organization || '';
+                
+                // Emergency Contact
+                document.getElementById('guardianName').value = trainee.emergency_contact_name || '';
+                document.getElementById('relationship').value = trainee.emergency_contact_relationship || '';
+                document.getElementById('guardianPhone').value = trainee.emergency_contact_phone || '';
+                
+                // Status
+                document.getElementById('traineeStatus').value = trainee.status || 'Active';
+                
+                // Profile Image
+                if (trainee.profile_image) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = trainee.profile_image;
+                    preview.classList.add('show');
+                    document.getElementById('imagePlaceholder').style.display = 'none';
+                }
+                
+                traineeModal.show();
+            } catch (error) {
+                showToast('Failed to load trainee data: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Save Trainee
+        // ============================================
+        async function saveTrainee() {
+            const id = document.getElementById('editTraineeId').value;
+            
+            // Collect form data
+            const data = {
+                first_name: document.getElementById('firstName').value.trim(),
+                middle_name: document.getElementById('middleName').value.trim(),
+                last_name: document.getElementById('lastName').value.trim(),
+                gender: document.getElementById('gender').value,
+                date_of_birth: document.getElementById('dateOfBirth').value,
+                email: document.getElementById('email').value.trim(),
+                phone_number: document.getElementById('phone').value.trim(),
+                alternative_phone: document.getElementById('altPhone').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                state_region: document.getElementById('region').value.trim(),
+                educational_level: document.getElementById('educationLevel').value,
+                occupation: document.getElementById('occupation').value.trim(),
+                organization: document.getElementById('organization').value.trim(),
+                emergency_contact_name: document.getElementById('guardianName').value.trim(),
+                emergency_contact_relationship: document.getElementById('relationship').value,
+                emergency_contact_phone: document.getElementById('guardianPhone').value.trim(),
+                status: document.getElementById('traineeStatus').value
+            };
+            
+            // Validate
+            if (!data.first_name || !data.last_name || !data.email || !data.phone_number) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+            
+            if (!data.gender || !data.date_of_birth || !data.educational_level) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+            
+            if (!data.emergency_contact_name || !data.emergency_contact_phone) {
+                showToast('Please fill in emergency contact details', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                // Check if profile image was uploaded
+                const fileInput = document.getElementById('profileImage');
+                if (fileInput.files && fileInput.files[0]) {
+                    // For simplicity, we'll handle file upload separately
+                    // You can implement file upload using FormData
+                    showToast('Image upload will be handled separately', 'info');
+                }
+                
+                let result;
+                if (id) {
+                    result = await apiCall(`/trainees/${id}`, 'PUT', data);
+                    showToast('Trainee updated successfully!', 'success');
+                } else {
+                    result = await apiCall('/trainees', 'POST', data);
+                    showToast('Trainee created successfully!', 'success');
+                }
+                
+                traineeModal.hide();
+                loadTrainees(currentPage);
+                
+            } catch (error) {
+                showToast('Failed to save trainee: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // View Trainee
+        // ============================================
+        async function viewTrainee(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/trainees/${id}`);
+                const t = result.data;
+                
+                document.getElementById('viewTraineeBody').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            ${t.profile_image ? 
+                                `<img src="${t.profile_image}" class="img-fluid rounded-circle" style="width:150px;height:150px;object-fit:cover;border:3px solid #e5e7eb;">` :
+                                `<div class="trainee-avatar-placeholder mx-auto" style="width:150px;height:150px;font-size:3rem;">${(t.first_name || '?').charAt(0).toUpperCase()}</div>`
+                            }
+                            <h6 class="mt-3">${t.first_name || ''} ${t.middle_name || ''} ${t.last_name || ''}</h6>
+                            <span class="trainee-code">${t.trainee_code || '-'}</span>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-6"><strong>Email:</strong> ${t.email || '-'}</div>
+                                <div class="col-6"><strong>Phone:</strong> ${t.phone_number || '-'}</div>
+                                <div class="col-6"><strong>Gender:</strong> ${t.gender || '-'}</div>
+                                <div class="col-6"><strong>DOB:</strong> ${t.date_of_birth || '-'}</div>
+                                <div class="col-6"><strong>Education:</strong> ${t.educational_level || '-'}</div>
+                                <div class="col-6"><strong>Status:</strong> 
+                                    <span class="status-badge ${(t.status || 'inactive').toLowerCase()}">${t.status || 'Inactive'}</span>
+                                </div>
+                                <div class="col-12 mt-2"><strong>Address:</strong> ${t.address || '-'}, ${t.city || ''}, ${t.state_region || ''}</div>
+                                <div class="col-12 mt-2"><strong>Emergency Contact:</strong> ${t.emergency_contact_name || '-'} (${t.emergency_contact_relationship || ''}) - ${t.emergency_contact_phone || '-'}</div>
+                                ${t.notes ? `<div class="col-12 mt-2"><strong>Notes:</strong> ${t.notes}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                viewModal.show();
+            } catch (error) {
+                showToast('Failed to load trainee details', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Delete Modal
+        // ============================================
+        function openDeleteModal(id) {
+            deleteTraineeId = id;
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to delete this trainee? This action cannot be undone.';
+            confirmModal.show();
+        }
+        
+        // ============================================
+        // Confirm Delete
+        // ============================================
+        async function confirmDelete() {
+            if (!deleteTraineeId) return;
+            
+            try {
+                showLoading();
+                await apiCall(`/trainees/${deleteTraineeId}`, 'DELETE');
+                showToast('Trainee deleted successfully!', 'success');
+                confirmModal.hide();
+                loadTrainees(currentPage);
+            } catch (error) {
+                showToast('Failed to delete trainee: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                deleteTraineeId = null;
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+            confirmModal.show();
+            
+            document.getElementById('confirmBtn').onclick = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            };
+        }
+        
+        console.log('👨‍🎓 Trainee Management page loaded successfully');
+        console.log('🔗 API Integration: api.js + trainees-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

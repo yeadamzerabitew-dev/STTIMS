@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Sessions - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Session Specific Styles */
+        .session-code {
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #7C3AED;
+            background: rgba(124, 58, 237, 0.08);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .session-time {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        
+        .session-topic {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .table-container .table {
+            min-width: 1000px;
+        }
+        
+        /* Status Badges */
+        .badge-scheduled { background: #DBEAFE; color: #1E40AF; }
+        .badge-ongoing { background: #FEF3C7; color: #92400E; }
+        .badge-completed { background: #D1FAE5; color: #065F46; }
+        .badge-cancelled { background: #FEE2E2; color: #991B1B; }
+        
+        /* Form Styles */
+        .form-section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #7C3AED;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .form-section {
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .session-type-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        .session-type-badge.lecture { background: #DBEAFE; color: #1E40AF; }
+        .session-type-badge.lab { background: #D1FAE5; color: #065F46; }
+        .session-type-badge.workshop { background: #FEF3C7; color: #92400E; }
+        .session-type-badge.practical { background: #EDE9FE; color: #5B21B6; }
+        .session-type-badge.review { background: #FCE4EC; color: #880E4F; }
+        .session-type-badge.exam { background: #FEE2E2; color: #991B1B; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="sessions.html"><i class="fas fa-clock"></i><span>Sessions</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Class Sessions</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-clock me-2 text-primary"></i>Class Sessions
+                    </h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="openAddSessionModal()">
+                            <i class="fas fa-plus-circle me-1"></i>Add Session
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput" 
+                                       placeholder="Search by topic or code..." oninput="filterSessions()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Batch</label>
+                            <select class="form-select" id="batchFilter" onchange="filterSessions()">
+                                <option value="">All Batches</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterSessions()">
+                                <option value="">All Status</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <button class="btn btn-outline-secondary btn-sm me-1" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-export me-1"></i>Export
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataExcel(); return false;"><i class="fas fa-file-excel me-2 text-success"></i>Export to Excel</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataPDF(); return false;"><i class="fas fa-file-pdf me-2 text-danger"></i>Export to PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sessions Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Class Sessions
+                            <span class="badge bg-primary ms-2" id="sessionCount">0</span>
+                        </h5>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadSessions()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table table-striped table-hover mb-0" id="sessionsTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Topic</th>
+                                        <th>Instructor</th>
+                                        <th>Room</th>
+                                        <th>Status</th>
+                                        <th style="width: 160px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sessionsTableBody">
+                                    <!-- Sessions loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <span class="text-muted small" id="tableInfo">Showing 0 of 0 sessions</span>
+                        <nav id="paginationContainer"></nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- Add/Edit Session Modal -->
+    <div class="modal fade" id="addSessionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2 text-primary"></i>
+                        <span id="sessionModalTitle">Add New Session</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="sessionForm" novalidate>
+                        <input type="hidden" id="editSessionId">
+                        
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Batch <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="sessionBatch" required>
+                                            <option value="">Select Batch</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a batch</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Instructor <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="sessionInstructor" required>
+                                            <option value="">Select Instructor</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select an instructor</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Session Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="sessionDate" required>
+                                        <div class="invalid-feedback">Session date is required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Start Time <span class="text-danger">*</span></label>
+                                        <input type="time" class="form-control" id="startTime" required>
+                                        <div class="invalid-feedback">Start time is required</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-label">End Time <span class="text-danger">*</span></label>
+                                        <input type="time" class="form-control" id="endTime" required>
+                                        <div class="invalid-feedback">End time is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Session Details -->
+                        <div class="form-section">
+                            <h6 class="form-section-title"><i class="fas fa-book me-2"></i>Session Details</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Topic Covered</label>
+                                        <input type="text" class="form-control" id="sessionTopic" placeholder="e.g., Introduction to Python">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Session Type <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="sessionType" required>
+                                            <option value="">Select Type</option>
+                                            <option value="Lecture">Lecture</option>
+                                            <option value="Lab">Lab</option>
+                                            <option value="Workshop">Workshop</option>
+                                            <option value="Practical">Practical</option>
+                                            <option value="Review">Review</option>
+                                            <option value="Exam">Exam</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select a session type</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Room Number</label>
+                                        <input type="text" class="form-control" id="sessionRoom">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select" id="sessionStatus">
+                                            <option value="Scheduled">Scheduled</option>
+                                            <option value="Ongoing">Ongoing</option>
+                                            <option value="Completed">Completed</option>
+                                            <option value="Cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" id="sessionNotes" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" id="saveSessionBtn">
+                        <i class="fas fa-save me-1"></i>Save Session
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Session Modal -->
+    <div class="modal fade" id="viewSessionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-clock me-2 text-primary"></i>Session Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewSessionBody">
+                    <!-- Session details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+
+    <!-- Export libraries (Excel + PDF) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="../js/export-utils.js"></script>
+    <script src="../js/sessions-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let currentPage = 1;
+        let totalPages = 1;
+        let perPage = 10;
+        let sessionsData = [];
+        let deleteSessionId = null;
+        let editSessionId = null;
+        let batchesList = [];
+        let instructorsList = [];
+        
+        const sessionModal = new bootstrap.Modal(document.getElementById('addSessionModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewSessionModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load batches and instructors for dropdowns
+            loadBatches();
+            loadInstructors();
+            
+            // Load sessions
+            loadSessions();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Save session button
+            document.getElementById('saveSessionBtn').addEventListener('click', saveSession);
+            
+            // Confirm button
+            document.getElementById('confirmBtn').addEventListener('click', confirmDelete);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+        }
+        
+        // ============================================
+        // Load Batches for Dropdowns
+        // ============================================
+        async function loadBatches() {
+            try {
+                const result = await apiCall('/batches');
+                batchesList = result.data || [];
+                
+                // Populate batch filter
+                const filterSelect = document.getElementById('batchFilter');
+                filterSelect.innerHTML = '<option value="">All Batches</option>' + 
+                    batchesList.map(b => `<option value="${b.batch_id}">${b.batch_name}</option>`).join('');
+                
+                // Populate batch dropdown in modal
+                const modalSelect = document.getElementById('sessionBatch');
+                modalSelect.innerHTML = '<option value="">Select Batch</option>' + 
+                    batchesList.map(b => `<option value="${b.batch_id}">${b.batch_name} (${b.course_title || 'No Course'})</option>`).join('');
+                
+            } catch (error) {
+                console.error('Failed to load batches:', error);
+            }
+        }
+        
+        // ============================================
+        // Load Instructors for Dropdowns
+        // ============================================
+        async function loadInstructors() {
+            try {
+                const result = await apiCall('/instructors');
+                instructorsList = result.data || [];
+                
+                // Populate instructor dropdown in modal
+                const modalSelect = document.getElementById('sessionInstructor');
+                modalSelect.innerHTML = '<option value="">Select Instructor</option>' + 
+                    instructorsList.map(i => `<option value="${i.instructor_id}">${i.first_name} ${i.last_name}</option>`).join('');
+                
+            } catch (error) {
+                console.error('Failed to load instructors:', error);
+            }
+        }
+        
+        // ============================================
+        // Load Sessions
+        // ============================================
+        async function loadSessions(page = 1) {
+            showLoading();
+            currentPage = page;
+            
+            const search = document.getElementById('searchInput').value;
+            const batch = document.getElementById('batchFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: perPage,
+                    search: search,
+                    batch_id: batch,
+                    status: status
+                });
+                
+                const result = await apiCall(`/sessions?${params.toString()}`);
+                
+                sessionsData = result.data || [];
+                totalPages = result.total_pages || 1;
+                
+                renderTable(sessionsData);
+                renderPagination();
+                updateTableInfo(result.total || 0);
+                
+            } catch (error) {
+                showToast('Failed to load sessions: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Render Table
+        // ============================================
+        function renderTable(sessions) {
+            const tbody = document.getElementById('sessionsTableBody');
+            const count = document.getElementById('sessionCount');
+            
+            count.textContent = sessions.length;
+            
+            if (!sessions || sessions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fas fa-clock fa-2x d-block mb-2"></i>
+                            No sessions found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = sessions.map(session => {
+                const statusClass = (session.status || 'scheduled').toLowerCase();
+                const typeClass = (session.session_type || 'lecture').toLowerCase();
+                
+                return `
+                    <tr>
+                        <td><span class="session-code">${session.session_code || '-'}</span></td>
+                        <td>${session.session_date || 'N/A'}</td>
+                        <td>
+                            <span class="session-time">${session.start_time || 'N/A'}</span>
+                            <br>
+                            <small class="text-muted">to ${session.end_time || 'N/A'}</small>
+                        </td>
+                        <td>
+                            <span class="session-topic" title="${session.topic_covered || ''}">
+                                ${session.topic_covered || '-'}
+                            </span>
+                            <br>
+                            <span class="session-type-badge ${typeClass}">
+                                ${session.session_type || 'Lecture'}
+                            </span>
+                        </td>
+                        <td>${session.instructor_name || 'N/A'}</td>
+                        <td>${session.room_number || '-'}</td>
+                        <td>
+                            <span class="badge badge-${statusClass}">
+                                ${session.status || 'Scheduled'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-info" onclick="viewSession(${session.session_id})" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="editSession(${session.session_id})" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="openDeleteModal(${session.session_id})" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // Render Pagination
+        // ============================================
+        function renderPagination() {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `<ul class="pagination pagination-sm mb-0">`;
+            
+            html += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadSessions(${currentPage - 1})">«</a>
+                </li>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadSessions(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadSessions(${currentPage + 1})">»</a>
+                </li>
+            `;
+            
+            html += `</ul>`;
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // Update Table Info
+        // ============================================
+        function updateTableInfo(total) {
+            const start = (currentPage - 1) * perPage + 1;
+            const end = Math.min(start + perPage - 1, total);
+            document.getElementById('tableInfo').textContent = 
+                `Showing ${total > 0 ? start : 0} to ${end} of ${total} sessions`;
+        }
+        
+        // ============================================
+        // Filter Functions
+        // ============================================
+        function filterSessions() {
+            loadSessions(1);
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('batchFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            loadSessions(1);
+        }
+        
+        function refreshTable() {
+            loadSessions(currentPage);
+        }
+        
+        // ============================================
+        // Export Data
+        // ============================================
+        function exportDataExcel() {
+            const columns = [
+                { key: 'session_code', label: 'Code' },
+                { key: 'batch_name', label: 'Batch' },
+                { key: 'course_title', label: 'Course' },
+                { key: 'instructor_name', label: 'Instructor' },
+                { key: 'session_date', label: 'Date' },
+                { key: 'start_time', label: 'Start' },
+                { key: 'end_time', label: 'End' },
+                { key: 'topic_covered', label: 'Topic' },
+                { key: 'session_type', label: 'Type' },
+                { key: 'status', label: 'Status' }
+            ];
+            exportArrayToExcel(sessionsData, columns, 'class-sessions', 'Class Sessions');
+        }
+
+        function exportDataPDF() {
+            const columns = [
+                { key: 'session_code', label: 'Code' },
+                { key: 'batch_name', label: 'Batch' },
+                { key: 'course_title', label: 'Course' },
+                { key: 'instructor_name', label: 'Instructor' },
+                { key: 'session_date', label: 'Date' },
+                { key: 'start_time', label: 'Start' },
+                { key: 'end_time', label: 'End' },
+                { key: 'topic_covered', label: 'Topic' },
+                { key: 'session_type', label: 'Type' },
+                { key: 'status', label: 'Status' }
+            ];
+            exportArrayToPDF(sessionsData, columns, 'class-sessions', 'Class Sessions Report');
+        }
+        
+        // ============================================
+        // Open Add Session Modal
+        // ============================================
+        function openAddSessionModal() {
+            editSessionId = null;
+            document.getElementById('sessionModalTitle').textContent = 'Add New Session';
+            document.getElementById('editSessionId').value = '';
+            document.getElementById('sessionForm').reset();
+            document.getElementById('sessionStatus').value = 'Scheduled';
+            sessionModal.show();
+        }
+        
+        // ============================================
+        // Edit Session
+        // ============================================
+        async function editSession(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/sessions/${id}`);
+                const session = result.data;
+                
+                editSessionId = id;
+                document.getElementById('sessionModalTitle').textContent = 'Edit Session';
+                document.getElementById('editSessionId').value = id;
+                
+                // Populate form
+                document.getElementById('sessionBatch').value = session.batch_id || '';
+                document.getElementById('sessionInstructor').value = session.instructor_id || '';
+                document.getElementById('sessionDate').value = session.session_date || '';
+                document.getElementById('startTime').value = session.start_time || '';
+                document.getElementById('endTime').value = session.end_time || '';
+                document.getElementById('sessionTopic').value = session.topic_covered || '';
+                document.getElementById('sessionType').value = session.session_type || '';
+                document.getElementById('sessionRoom').value = session.room_number || '';
+                document.getElementById('sessionStatus').value = session.status || 'Scheduled';
+                document.getElementById('sessionNotes').value = session.notes || '';
+                
+                sessionModal.show();
+            } catch (error) {
+                showToast('Failed to load session data: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Save Session
+        // ============================================
+        async function saveSession() {
+            const id = document.getElementById('editSessionId').value;
+            
+            const data = {
+                batch_id: parseInt(document.getElementById('sessionBatch').value),
+                instructor_id: parseInt(document.getElementById('sessionInstructor').value),
+                session_date: document.getElementById('sessionDate').value,
+                start_time: document.getElementById('startTime').value,
+                end_time: document.getElementById('endTime').value,
+                topic_covered: document.getElementById('sessionTopic').value.trim(),
+                session_type: document.getElementById('sessionType').value,
+                room_number: document.getElementById('sessionRoom').value.trim(),
+                status: document.getElementById('sessionStatus').value,
+                notes: document.getElementById('sessionNotes').value.trim()
+            };
+            
+            // Validate
+            if (!data.batch_id || !data.instructor_id) {
+                showToast('Please select a batch and instructor', 'warning');
+                return;
+            }
+            
+            if (!data.session_date || !data.start_time || !data.end_time) {
+                showToast('Session date and time are required', 'warning');
+                return;
+            }
+            
+            if (!data.session_type) {
+                showToast('Please select a session type', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                if (id) {
+                    await apiCall(`/sessions/${id}`, 'PUT', data);
+                    showToast('Session updated successfully!', 'success');
+                } else {
+                    await apiCall('/sessions', 'POST', data);
+                    showToast('Session created successfully!', 'success');
+                }
+                
+                sessionModal.hide();
+                loadSessions(currentPage);
+                
+            } catch (error) {
+                showToast('Failed to save session: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // View Session
+        // ============================================
+        async function viewSession(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/sessions/${id}`);
+                const session = result.data;
+                
+                document.getElementById('viewSessionBody').innerHTML = `
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5>Session ${session.session_code}</h5>
+                                    <span class="badge badge-${(session.status || 'scheduled').toLowerCase()}">${session.status || 'Scheduled'}</span>
+                                    <span class="session-type-badge ${(session.session_type || 'lecture').toLowerCase()} ms-2">${session.session_type || 'Lecture'}</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Batch:</strong> ${session.batch_name || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Course:</strong> ${session.course_title || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Instructor:</strong> ${session.instructor_name || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Date:</strong> ${session.session_date || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Time:</strong> ${session.start_time || 'N/A'} - ${session.end_time || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Room:</strong> ${session.room_number || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Topic:</strong> ${session.topic_covered || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Type:</strong> ${session.session_type || 'Lecture'}
+                                </div>
+                                ${session.notes ? `
+                                    <div class="col-12 mt-2">
+                                        <strong>Notes:</strong>
+                                        <p class="mt-1">${session.notes}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                viewModal.show();
+            } catch (error) {
+                showToast('Failed to load session details', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Delete Modal
+        // ============================================
+        function openDeleteModal(id) {
+            const session = sessionsData.find(s => s.session_id === id);
+            if (!session) {
+                showToast('Session not found', 'error');
+                return;
+            }
+            
+            deleteSessionId = id;
+            document.getElementById('confirmBody').innerHTML = `
+                Are you sure you want to delete session <strong>"${session.session_code}"</strong>? 
+                This action cannot be undone.
+            `;
+            confirmModal.show();
+        }
+        
+        // ============================================
+        // Confirm Delete
+        // ============================================
+        async function confirmDelete() {
+            if (!deleteSessionId) return;
+            
+            try {
+                showLoading();
+                await apiCall(`/sessions/${deleteSessionId}`, 'DELETE');
+                showToast('Session deleted successfully!', 'success');
+                confirmModal.hide();
+                loadSessions(currentPage);
+            } catch (error) {
+                showToast('Failed to delete session: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                deleteSessionId = null;
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+            confirmModal.show();
+            
+            document.getElementById('confirmBtn').onclick = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            };
+        }
+        
+        console.log('🕐 Class Sessions page loaded successfully');
+        console.log('🔗 API Integration: api.js + sessions-api.js loaded');
+    </script>
+    <script src="../js/role-based-sidebar.js"></script>
+    <script src="../js/apply-role-guard.js"></script>
+</body>
+</html>

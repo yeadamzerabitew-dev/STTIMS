@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard API Test</title>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard-api.js"></script>
+</head>
+<body>
+    <h1>Dashboard API Test</h1>
+    <button onclick="testStats()">Get Dashboard Stats</button>
+    <button onclick="testActivities()">Get Activities</button>
+    <button onclick="testEnrollment()">Get Enrollment Trends</button>
+    <div id="result"></div>
+
+    <script>
+        async function testStats() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Loading...';
+            try {
+                const data = await getDashboardStats();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (e) {
+                result.innerHTML = '❌ Error: ' + e.message;
+                console.error(e);
+            }
+        }
+
+        async function testActivities() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Loading...';
+            try {
+                const data = await getDashboardActivities();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (e) {
+                result.innerHTML = '❌ Error: ' + e.message;
+                console.error(e);
+            }
+        }
+
+        async function testEnrollment() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Loading...';
+            try {
+                const data = await getEnrollmentTrends();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (e) {
+                result.innerHTML = '❌ Error: ' + e.message;
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+/* ============================================
+   STTIMS - Sidebar Styles
+   ============================================ */
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+.sidebar .nav-link i { font-size: 1.1rem; }
+.sidebar .nav-link.active { background: var(--primary); box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+
+/* Collapsed Sidebar */
+.sidebar.collapsed { width: 70px; }
+.sidebar.collapsed .nav-link span { display: none; }
+.sidebar.collapsed .nav-link i { margin-right: 0; font-size: 1.2rem; }
+
+.sidebar .nav-item .sub-menu { padding-left: 2rem; }
+.sidebar .nav-item .sub-menu .nav-link { font-size: 0.875rem; padding: 0.4rem 1rem; }

@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Management - STTIMS</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    
+    <style>
+        /* Certificate Specific Styles */
+        .certificate-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #fff;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .certificate-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            transform: translateY(-4px);
+        }
+        
+        .certificate-card .cert-number {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #4F46E5;
+            font-weight: 600;
+        }
+        
+        .certificate-card .cert-icon {
+            font-size: 2.5rem;
+            color: #4F46E5;
+            opacity: 0.15;
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+        }
+        
+        .certificate-card .cert-status {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.25rem 1rem;
+            border-radius: 0 12px 0 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .certificate-card .cert-status.issued {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .certificate-card .cert-status.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .certificate-card .cert-status.revoked {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .certificate-card .cert-status.expired {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+        
+        .filter-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        /* Certificate Preview Modal */
+        .certificate-preview {
+            padding: 2rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px dashed #d1d5db;
+            position: relative;
+        }
+        
+        .certificate-preview .cert-border {
+            border: 3px double #4F46E5;
+            padding: 3rem;
+            background: #fff;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .certificate-preview .cert-border .corner {
+            position: absolute;
+            font-size: 1.5rem;
+            color: #4F46E5;
+        }
+        
+        .certificate-preview .cert-border .corner.tl { top: 10px; left: 15px; }
+        .certificate-preview .cert-border .corner.tr { top: 10px; right: 15px; }
+        .certificate-preview .cert-border .corner.bl { bottom: 10px; left: 15px; }
+        .certificate-preview .cert-border .corner.br { bottom: 10px; right: 15px; }
+        
+        .certificate-preview .cert-logo {
+            width: 60px;
+            height: 60px;
+            background: #4F46E5;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .certificate-preview .cert-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1F2937;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .certificate-preview .cert-body {
+            font-size: 1rem;
+            color: #4B5563;
+            line-height: 1.8;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .certificate-preview .cert-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4F46E5;
+            margin: 0.5rem 0;
+        }
+        
+        .certificate-preview .cert-course {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1F2937;
+        }
+        
+        .certificate-preview .cert-signatures {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        
+        .certificate-preview .cert-signatures .signature {
+            text-align: center;
+        }
+        
+        .certificate-preview .cert-signatures .signature .sig-line {
+            width: 120px;
+            height: 2px;
+            background: #1F2937;
+            margin: 0.5rem auto;
+        }
+        
+        .certificate-preview .cert-signatures .signature .sig-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .certificate-preview .cert-signatures .signature .sig-title {
+            font-size: 0.7rem;
+            color: #6B7280;
+        }
+        
+        .certificate-preview .cert-qr img {
+            width: 84px;
+            height: 84px;
+            display: block;
+            background: #fff;
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        .certificate-preview .cert-footer {
+            margin-top: 1.5rem;
+            font-size: 0.7rem;
+            color: #9CA3AF;
+        }
+        
+        .certificate-preview .cert-verify {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-align: left;
+            font-size: 0.75rem;
+            color: #065F46;
+            margin-top: 1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filter-section .row > div {
+                margin-bottom: 0.5rem;
+            }
+            .filter-section .row > div:last-child {
+                margin-bottom: 0;
+            }
+            
+            .certificate-preview .cert-border {
+                padding: 1.5rem;
+            }
+            
+            .certificate-preview .cert-title {
+                font-size: 1.25rem;
+            }
+            
+            .certificate-preview .cert-name {
+                font-size: 1.2rem;
+            }
+            
+            .certificate-preview .cert-signatures {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <a class="navbar-brand" href="dashboard.html">
+                    <i class="fas fa-graduation-cap me-2"></i>STTIMS
+                </a>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <a href="#" class="btn btn-link text-white position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge rounded-pill bg-danger">5</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item text-center text-primary">View all</a>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-link text-white p-0" data-bs-toggle="dropdown">
+                            <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff&size=32" 
+                                 alt="Profile" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="settings.html"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger logout-btn" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white text-center"><i class="fas fa-graduation-cap me-2"></i>STTIMS</h5>
+                <button class="btn btn-link text-white sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="users.html"><i class="fas fa-users-cog"></i><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="trainees.html"><i class="fas fa-user-graduate"></i><span>Trainees</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="instructors.html"><i class="fas fa-chalkboard-teacher"></i><span>Instructors</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="categories.html"><i class="fas fa-folder-open"></i><span>Categories</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="courses.html"><i class="fas fa-book"></i><span>Courses</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="batches.html"><i class="fas fa-layer-group"></i><span>Batches</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="enrollments.html"><i class="fas fa-edit"></i><span>Enrollments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="attendance.html"><i class="fas fa-clipboard-check"></i><span>Attendance</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="assessments.html"><i class="fas fa-tasks"></i><span>Assessments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="results.html"><i class="fas fa-chart-bar"></i><span>Results</span></a></li>
+                <li class="nav-item"><a class="nav-link active" href="certificates.html"><i class="fas fa-certificate"></i><span>Certificates</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html"><i class="fas fa-file-alt"></i><span>Reports</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="settings.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+            </ul>
+            <div class="sidebar-footer"><small class="text-muted">STTIMS v1.0.0</small></div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <div class="page-content">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+                        <li class="breadcrumb-item active">Certificate Management</li>
+                    </ol>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <h3 class="page-title mb-2 mb-sm-0">
+                        <i class="fas fa-certificate me-2 text-primary"></i>Certificate Management
+                    </h3>
+                    <div>
+                        <button class="btn btn-success" onclick="showGenerateModal()">
+                            <i class="fas fa-plus-circle me-1"></i>Generate Certificate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput" 
+                                       placeholder="Search by number or trainee..." oninput="filterCertificates()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Status</label>
+                            <select class="form-select" id="statusFilter" onchange="filterCertificates()">
+                                <option value="">All Status</option>
+                                <option value="Issued">Issued</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Revoked">Revoked</option>
+                                <option value="Expired">Expired</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-outline-secondary btn-sm me-1" onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-file-export me-1"></i>Export
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataExcel(); return false;"><i class="fas fa-file-excel me-2 text-success"></i>Export to Excel</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportDataPDF(); return false;"><i class="fas fa-file-pdf me-2 text-danger"></i>Export to PDF</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certificates Grid -->
+                <div class="row g-4" id="certificatesContainer">
+                    <!-- Certificates will be loaded dynamically -->
+                    <div class="col-12 text-center py-5 text-muted" id="loadingCertificates">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Loading certificates...
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4" id="paginationContainer"></div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <span>&copy; 2024 STTIMS. All rights reserved.</span>
+                        <span class="text-muted small">Version 1.0.0</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS                                        -->
+    <!-- ============================================ -->
+
+    <!-- Generate Certificate Modal -->
+    <div class="modal fade" id="generateModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-certificate me-2 text-primary"></i>Generate Certificate
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="generateForm">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Select Enrollment <span class="text-danger">*</span></label>
+                            <select class="form-select" id="certEnrollment" required>
+                                <option value="">Select Enrollment</option>
+                            </select>
+                            <div class="form-text">Only completed enrollments are shown</div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Issue Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="certIssueDate" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" class="form-control" id="certExpiryDate">
+                            <div class="form-text">Leave empty for non-expiring certificates</div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="certNotes" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" id="generateCertBtn">
+                        <i class="fas fa-certificate me-1"></i>Generate Certificate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Certificate Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-certificate me-2 text-primary"></i>Certificate Preview
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="previewBody">
+                    <!-- Certificate preview will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" onclick="printCertificate()">
+                        <i class="fas fa-print me-1"></i>Print
+                    </button>
+                    <button class="btn btn-success" onclick="downloadPDF()">
+                        <i class="fas fa-file-pdf me-1"></i>Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmBody">Are you sure?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT INCLUDES                         -->
+    <!-- ============================================ -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- html2pdf for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- QR code generator for certificate verification -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.0.3/qrcode.min.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- API INTEGRATION SCRIPTS (ADDED HERE)        -->
+    <!-- ============================================ -->
+    <script src="../js/api.js"></script>
+
+    <!-- Export libraries (Excel + PDF) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="../js/export-utils.js"></script>
+    <script src="../js/certificates-api.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- PAGE-SPECIFIC JAVASCRIPT                    -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM Elements
+        // ============================================
+        let currentPage = 1;
+        let totalPages = 1;
+        let perPage = 12;
+        let certificatesData = [];
+        let deleteCertId = null;
+        let previewCertId = null;
+        let enrollmentsList = [];
+        
+        const generateModal = new bootstrap.Modal(document.getElementById('generateModal'));
+        const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        
+        // ============================================
+        // Initialize Page
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Set default date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('certIssueDate').value = today;
+            
+            // Load certificates
+            loadCertificates();
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        // ============================================
+        // Setup Event Listeners
+        // ============================================
+        function setupEventListeners() {
+            // Generate certificate button
+            document.getElementById('generateCertBtn').addEventListener('click', generateCertificate);
+            
+            // Confirm button
+            document.getElementById('confirmBtn').addEventListener('click', confirmDelete);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('show');
+            });
+            
+            document.getElementById('sidebarClose').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.remove('show');
+            });
+            
+            // Load enrollments when generate modal opens
+            document.getElementById('generateModal').addEventListener('show.bs.modal', loadEnrollments);
+        }
+        
+        // ============================================
+        // Load Certificates
+        // ============================================
+        async function loadCertificates(page = 1) {
+            showLoading();
+            currentPage = page;
+            
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: perPage,
+                    search: search,
+                    status: status
+                });
+                
+                const result = await apiCall(`/certificates?${params.toString()}`);
+                
+                certificatesData = result.data || [];
+                totalPages = result.total_pages || 1;
+                
+                renderCertificates(certificatesData);
+                renderPagination();
+                
+            } catch (error) {
+                showToast('Failed to load certificates: ' + error.message, 'error');
+                document.getElementById('certificatesContainer').innerHTML = `
+                    <div class="col-12 text-center py-5 text-danger">
+                        <i class="fas fa-exclamation-circle fa-3x d-block mb-2"></i>
+                        <p>Failed to load certificates</p>
+                        <button class="btn btn-sm btn-primary" onclick="loadCertificates()">
+                            <i class="fas fa-sync-alt me-1"></i>Retry
+                        </button>
+                    </div>
+                `;
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Render Certificates
+        // ============================================
+        function renderCertificates(certificates) {
+            const container = document.getElementById('certificatesContainer');
+            
+            if (!certificates || certificates.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5 text-muted">
+                        <i class="fas fa-certificate fa-3x d-block mb-2"></i>
+                        <p>No certificates found</p>
+                        <button class="btn btn-sm btn-success" onclick="showGenerateModal()">
+                            <i class="fas fa-plus-circle me-1"></i>Generate First Certificate
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = certificates.map(cert => {
+                const statusClass = (cert.status || 'pending').toLowerCase();
+                const statusIcons = {
+                    issued: 'fa-check-circle text-success',
+                    pending: 'fa-clock text-warning',
+                    revoked: 'fa-times-circle text-danger',
+                    expired: 'fa-exclamation-circle text-muted'
+                };
+                const iconClass = statusIcons[statusClass] || 'fa-certificate text-primary';
+                
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="certificate-card">
+                            <i class="fas ${iconClass} cert-icon"></i>
+                            <span class="cert-status ${statusClass}">${cert.status || 'Pending'}</span>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="cert-logo me-3" style="width:50px;height:50px;font-size:1.2rem;background:#4F46E5;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div>
+                                    <div class="cert-number">${cert.certificate_number || 'N/A'}</div>
+                                    <small class="text-muted">${cert.issue_date || 'No date'}</small>
+                                </div>
+                            </div>
+                            <h6 class="mb-1">${cert.trainee_name || 'Unknown Trainee'}</h6>
+                            <small class="text-muted">${cert.course_title || 'No Course'}</small>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>${cert.trainee_code || ''}
+                                    </small>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="previewCertificate(${cert.certificate_id})" title="Preview">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning" onclick="editCertificate(${cert.certificate_id})" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" onclick="openDeleteModal(${cert.certificate_id})" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                ${cert.verification_token ? `
+                                    <small class="text-muted d-block mt-1">
+                                        <i class="fas fa-shield-alt me-1"></i>Verification: ${cert.verification_token.substring(0, 12)}...
+                                    </small>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // Render Pagination
+        // ============================================
+        function renderPagination() {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `<nav><ul class="pagination">`;
+            
+            html += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadCertificates(${currentPage - 1})">«</a>
+                </li>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="loadCertificates(${i})">${i}</a>
+                    </li>
+                `;
+            }
+            
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="loadCertificates(${currentPage + 1})">»</a>
+                </li>
+            `;
+            
+            html += `</ul></nav>`;
+            container.innerHTML = html;
+        }
+        
+        // ============================================
+        // Filter Functions
+        // ============================================
+        function filterCertificates() {
+            loadCertificates(1);
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            loadCertificates(1);
+        }
+        
+        function refreshTable() {
+            loadCertificates(currentPage);
+        }
+        
+        // ============================================
+        // Export Data
+        // ============================================
+        function exportDataExcel() {
+            const columns = [
+                { key: 'certificate_number', label: 'Certificate #' },
+                { key: 'trainee_name', label: 'Trainee' },
+                { key: 'course_title', label: 'Course' },
+                { key: 'batch_name', label: 'Batch' },
+                { key: 'issue_date', label: 'Issue Date' },
+                { key: 'expiry_date', label: 'Expiry Date' },
+                { key: 'status', label: 'Status' }
+            ];
+            exportArrayToExcel(certificatesData, columns, 'certificates', 'Certificates');
+        }
+
+        function exportDataPDF() {
+            const columns = [
+                { key: 'certificate_number', label: 'Certificate #' },
+                { key: 'trainee_name', label: 'Trainee' },
+                { key: 'course_title', label: 'Course' },
+                { key: 'batch_name', label: 'Batch' },
+                { key: 'issue_date', label: 'Issue Date' },
+                { key: 'expiry_date', label: 'Expiry Date' },
+                { key: 'status', label: 'Status' }
+            ];
+            exportArrayToPDF(certificatesData, columns, 'certificates', 'Certificates Report');
+        }
+        
+        // ============================================
+        // Load Enrollments for Certificate Generation
+        // ============================================
+        async function loadEnrollments() {
+            try {
+                const result = await apiCall('/enrollments?status=Completed');
+                enrollmentsList = result.data || [];
+                
+                const select = document.getElementById('certEnrollment');
+                select.innerHTML = '<option value="">Select Enrollment</option>' + 
+                    enrollmentsList.map(e => 
+                        `<option value="${e.enrollment_id}">${e.trainee_name || 'Unknown'} - ${e.course_title || 'No Course'}</option>`
+                    ).join('');
+                
+            } catch (error) {
+                console.error('Failed to load enrollments:', error);
+            }
+        }
+        
+        // ============================================
+        // Show Generate Modal
+        // ============================================
+        function showGenerateModal() {
+            document.getElementById('generateForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('certIssueDate').value = today;
+            generateModal.show();
+        }
+        
+        // ============================================
+        // Generate Certificate
+        // ============================================
+        async function generateCertificate() {
+            const enrollmentId = document.getElementById('certEnrollment').value;
+            const issueDate = document.getElementById('certIssueDate').value;
+            const expiryDate = document.getElementById('certExpiryDate').value;
+            const notes = document.getElementById('certNotes').value.trim();
+            
+            if (!enrollmentId || !issueDate) {
+                showToast('Please select an enrollment and issue date', 'warning');
+                return;
+            }
+            
+            try {
+                showLoading();
+                
+                const data = {
+                    enrollment_id: parseInt(enrollmentId),
+                    issue_date: issueDate,
+                    expiry_date: expiryDate || null,
+                    notes: notes
+                };
+                
+                const result = await apiCall('/certificates', 'POST', data);
+                
+                showToast('Certificate generated successfully!', 'success');
+                generateModal.hide();
+                loadCertificates(currentPage);
+                
+            } catch (error) {
+                showToast('Failed to generate certificate: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Preview Certificate
+        // ============================================
+        // ============================================
+        // Build QR Code for Certificate Verification
+        // ============================================
+        function buildCertQrImgTag(cert, cellSize = 4) {
+            if (typeof qrcode === 'undefined' || !cert.verification_token) return '';
+            try {
+                const basePath = window.location.href.split('/pages/')[0];
+                const verifyUrl = `${basePath}/verify.html?token=${encodeURIComponent(cert.verification_token)}`;
+
+                // This build of qrcode-generator does NOT support typeNumber=0
+                // ("auto-size") - passing 0 throws inside the library. Instead,
+                // try increasing type numbers until the data fits.
+                let qr = null;
+                for (let typeNumber = 4; typeNumber <= 40; typeNumber++) {
+                    try {
+                        const candidate = qrcode(typeNumber, 'M');
+                        candidate.addData(verifyUrl);
+                        candidate.make();
+                        qr = candidate;
+                        break;
+                    } catch (sizeError) {
+                        qr = null; // too small for this typeNumber - try the next size up
+                    }
+                }
+
+                if (!qr) {
+                    console.error('QR generation failed: data too long for any supported size');
+                    return '';
+                }
+
+                return qr.createImgTag(cellSize, 4);
+            } catch (e) {
+                console.error('QR generation failed:', e);
+                return '';
+            }
+        }
+
+        async function previewCertificate(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/certificates/${id}`);
+                const cert = result.certificate;
+                previewCertId = id;
+                const qrImgTag = buildCertQrImgTag(cert);
+                
+                document.getElementById('previewBody').innerHTML = `
+                    <div class="certificate-preview">
+                        <div class="cert-border">
+                            <span class="corner tl">✦</span>
+                            <span class="corner tr">✦</span>
+                            <span class="corner bl">✦</span>
+                            <span class="corner br">✦</span>
+                            
+                            <div class="cert-logo"><i class="fas fa-graduation-cap"></i></div>
+                            
+                            <div class="cert-title">CERTIFICATE OF COMPLETION</div>
+                            
+                            <div class="cert-body">
+                                This certificate is presented to
+                                <div class="cert-name">${cert.trainee_name || 'Unknown Trainee'}</div>
+                                for successfully completing the course
+                                <div class="cert-course">${cert.course_title || 'No Course'}</div>
+                                <div style="font-size:0.9rem;color:#6B7280;margin-top:0.5rem;">
+                                    Completed on: ${cert.issue_date || 'N/A'}
+                                    ${cert.expiry_date ? ` | Valid until: ${cert.expiry_date}` : ''}
+                                </div>
+                            </div>
+                            
+                            <div class="cert-signatures">
+                                <div class="signature">
+                                    <div class="sig-line"></div>
+                                    <div class="sig-name">${cert.signatory_name || 'Instructor'}</div>
+                                    <div class="sig-title">${cert.signatory_title || 'Course Instructor'}</div>
+                                </div>
+                                <div class="signature">
+                                    <div class="sig-line"></div>
+                                    <div class="sig-name">${cert.approved_by_name || 'Director'}</div>
+                                    <div class="sig-title">${cert.approved_by_title || 'Training Director'}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="cert-footer">
+                                Certificate Number: ${cert.certificate_number || 'N/A'}
+                            </div>
+                            
+                            <div class="cert-verify">
+                                ${qrImgTag ? `<div class="cert-qr">${qrImgTag}</div>` : ''}
+                                <div>
+                                    <div><i class="fas fa-check-circle me-1"></i>Certificate Verified</div>
+                                    <div style="font-size:0.7rem;opacity:0.85;word-break:break-all;">${cert.verification_token || 'N/A'}</div>
+                                    ${qrImgTag ? '<div style="font-size:0.7rem;opacity:0.85;">Scan to verify authenticity</div>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                previewModal.show();
+            } catch (error) {
+                showToast('Failed to load certificate: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Print Certificate
+        // ============================================
+        function printCertificate() {
+            const content = document.querySelector('.certificate-preview');
+            if (!content) return;
+            
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Certificate</title>
+                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                        <style>
+                            body { padding: 20px; background: #fff; }
+                            .certificate-preview { max-width: 800px; margin: 0 auto; }
+                            .cert-border { border: 3px double #4F46E5; padding: 2rem; border-radius: 8px; }
+                            .cert-logo { width: 60px; height: 60px; background: #4F46E5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 1.5rem; }
+                            .cert-title { font-size: 1.75rem; font-weight: 700; color: #1F2937; letter-spacing: 2px; }
+                            .cert-name { font-size: 1.5rem; font-weight: 700; color: #4F46E5; }
+                            .sig-line { width: 120px; height: 2px; background: #1F2937; margin: 0.5rem auto; }
+                            .cert-verify { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 0.5rem 1rem; display: inline-block; font-size: 0.75rem; color: #065F46; }
+                            .corner { position: absolute; font-size: 1.5rem; color: #4F46E5; }
+                            .cert-border { position: relative; }
+                            .tl { top: 15px; left: 20px; }
+                            .tr { top: 15px; right: 20px; }
+                            .bl { bottom: 15px; left: 20px; }
+                            .br { bottom: 15px; right: 20px; }
+                            @media print {
+                                .no-print { display: none; }
+                                body { padding: 0; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${content.outerHTML}
+                        <div class="text-center mt-3 no-print">
+                            <button onclick="window.print()" class="btn btn-primary">Print</button>
+                            <button onclick="window.close()" class="btn btn-secondary">Close</button>
+                        </div>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        // ============================================
+        // Download PDF
+        // ============================================
+        function downloadPDF() {
+            const content = document.querySelector('.certificate-preview');
+            if (!content) return;
+            
+            const opt = {
+                margin: 1,
+                filename: `Certificate_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(content).save();
+        }
+        
+        // ============================================
+        // Edit Certificate
+        // ============================================
+        async function editCertificate(id) {
+            try {
+                showLoading();
+                const result = await apiCall(`/certificates/${id}`);
+                const cert = result.certificate;
+                
+                // Show a simple edit modal or inline edit
+                showToast('Edit functionality: Update status or details', 'info');
+                
+                // For now, just show details
+                previewCertificate(id);
+                
+            } catch (error) {
+                showToast('Failed to load certificate: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // ============================================
+        // Open Delete Modal
+        // ============================================
+        function openDeleteModal(id) {
+            const cert = certificatesData.find(c => c.certificate_id === id);
+            if (!cert) {
+                showToast('Certificate not found', 'error');
+                return;
+            }
+            
+            deleteCertId = id;
+            document.getElementById('confirmBody').innerHTML = `
+                Are you sure you want to delete certificate <strong>"${cert.certificate_number}"</strong>? 
+                This action cannot be undone.
+            `;
+            confirmModal.show();
+        }
+        
+        // ============================================
+        // Confirm Delete
+        // ============================================
+        async function confirmDelete() {
+            if (!deleteCertId) return;
+            
+            try {
+                showLoading();
+                await apiCall(`/certificates/${deleteCertId}`, 'DELETE');
+                showToast('Certificate deleted successfully!', 'success');
+                confirmModal.hide();
+                loadCertificates(currentPage);
+            } catch (error) {
+                showToast('Failed to delete certificate: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+                deleteCertId = null;
+            }
+        }
+        
+        // ============================================
+        // Toast Notification
+        // ============================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const icons = {
+                success: 'fa-check-circle text-success',
+                error: 'fa-exclamation-circle text-danger',
+                warning: 'fa-exclamation-triangle text-warning',
+                info: 'fa-info-circle text-info'
+            };
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-danger' :
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            container.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${icons[type] || icons.info} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alert = container.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => { container.innerHTML = ''; }, 300);
+                }
+            }, 5000);
+        }
+        
+        // ============================================
+        // Loading Helpers
+        // ============================================
+        function showLoading() {
+            const overlay = document.createElement('div');
+            overlay.id = 'loadingOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            overlay.innerHTML = `
+                <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.remove();
+        }
+        
+        // ============================================
+        // Logout
+        // ============================================
+        function logoutUser() {
+            document.getElementById('confirmBody').textContent = 'Are you sure you want to logout?';
+            confirmModal.show();
+            
+            document.getElementById('confirmBtn').onclick = function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('user');
+                window.location.href = 'login.html';
+            };
+        }
+        
+        console.log('🎓 Certificate Management page loaded successfully');
+        console.log('🔗 API Integration: api.js + certificates-api.js loaded');
+    </script>
+</body>
+</html>
