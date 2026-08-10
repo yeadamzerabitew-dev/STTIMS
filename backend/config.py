@@ -11,12 +11,17 @@ class Config:
     
     # Database Configuration
     DB_HOST = os.environ.get('DB_HOST', 'localhost')
+    DB_PORT = os.environ.get('DB_PORT', '3306')
     DB_USER = os.environ.get('DB_USER', 'root')
     DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
     DB_NAME = os.environ.get('DB_NAME', 'sttims_db')
+    # Path to a CA certificate file, required by managed MySQL hosts that
+    # enforce SSL (e.g. Aiven). Leave unset for a plain local MySQL install.
+    DB_SSL_CA = os.environ.get('DB_SSL_CA', '')
     
     # SQLAlchemy Configuration
-    SQLALCHEMY_DATABASE_URI = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+    _ssl_query = f"?ssl_ca={DB_SSL_CA}" if DB_SSL_CA else ""
+    SQLALCHEMY_DATABASE_URI = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}{_ssl_query}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False  # Set to True for debugging SQL queries
     

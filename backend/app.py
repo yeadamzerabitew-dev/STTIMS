@@ -58,8 +58,14 @@ def create_app(config_class=None):
     if config_class:
         app.config.from_object(config_class)
     else:
-        from config import DevelopmentConfig
-        app.config.from_object(DevelopmentConfig)
+        # FLASK_ENV=production (set this on Render) switches off debug mode
+        # and verbose SQL logging; anything else defaults to development.
+        if os.environ.get('FLASK_ENV') == 'production':
+            from config import ProductionConfig
+            app.config.from_object(ProductionConfig)
+        else:
+            from config import DevelopmentConfig
+            app.config.from_object(DevelopmentConfig)
     
     # =============================================
     # CRITICAL: Initialize db with the app
