@@ -3,7 +3,7 @@
  * Handles all API calls to the backend
  */
 
-const API_BASE = 'http://127.0.0.1:5000/api';
+const API_BASE = 'https://sttims1.onrender.com/api';
 
 /**
  * Generic API call used by every *-api.js and page script

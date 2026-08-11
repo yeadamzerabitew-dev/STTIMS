@@ -29,6 +29,31 @@ from models import db
 load_dotenv()
 
 # =============================================
+# CORS Allowlist
+# -----------------------------------------------
+# Access-Control-Allow-Origin can't be "*" when requests carry
+# credentials (cookies), which api.js does. So instead of a wildcard,
+# we echo back the request's Origin header if it's on this allowlist.
+# Add FRONTEND_URL as an env var on Render if your frontend URL ever changes.
+# =============================================
+ALLOWED_ORIGINS = {
+    os.environ.get('FRONTEND_URL', 'https://sttims-frontend.onrender.com'),
+    'https://sttims-frontend.onrender.com',
+    'http://127.0.0.1:5000',
+    'http://localhost:5000',
+    'http://127.0.0.1:5500',
+    'http://localhost:5500',
+}
+
+
+def _resolve_allowed_origin():
+    """Return the request's Origin if it's allowed, else the primary frontend URL."""
+    origin = request.headers.get('Origin')
+    if origin in ALLOWED_ORIGINS:
+        return origin
+    return os.environ.get('FRONTEND_URL', 'https://sttims-frontend.onrender.com')
+
+# =============================================
 # Initialize extensions at module level
 # =============================================
 migrate = Migrate()
@@ -184,11 +209,12 @@ def create_app(config_class=None):
     @app.after_request
     def add_cors_headers(response):
         """Add CORS headers to all responses"""
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Origin'] = _resolve_allowed_origin()
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With, Accept'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
         response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Access-Control-Max-Age'] = '3600'
+        response.headers['Vary'] = 'Origin'
         return response
     
     # =============================================
@@ -199,7 +225,7 @@ def create_app(config_class=None):
         """Handle CORS preflight requests"""
         if request.method == 'OPTIONS':
             response = app.make_default_options_response()
-            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Origin'] = _resolve_allowed_origin()
             response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With, Accept'
             response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
             response.headers['Access-Control-Allow-Credentials'] = 'true'
