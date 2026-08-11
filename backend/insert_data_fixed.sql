@@ -231,23 +231,23 @@ INSERT INTO enrollments (
 -- 8. CLASS SESSIONS
 -- ---------------------------------------------
 INSERT INTO class_sessions (
-    session_code, batch_id, session_date, start_time, end_time,
+    session_code, batch_id, instructor_id, session_date, start_time, end_time,
     topic_covered, session_type, room_number, status
 ) VALUES
-('S-2024-001', 1, '2024-02-01', '09:00:00', '12:00:00', 'Introduction to Python', 'Lecture', 'Room 101', 'Completed'),
-('S-2024-002', 1, '2024-02-03', '09:00:00', '12:00:00', 'Python Syntax and Data Types', 'Lecture', 'Room 101', 'Completed'),
-('S-2024-003', 1, '2024-02-05', '09:00:00', '12:00:00', 'Control Structures', 'Lecture', 'Room 101', 'Completed'),
-('S-2024-004', 1, '2024-02-08', '09:00:00', '12:00:00', 'Functions and Modules', 'Lecture', 'Room 101', 'Completed'),
-('S-2024-005', 1, '2024-02-10', '09:00:00', '12:00:00', 'Object-Oriented Programming', 'Lecture', 'Room 101', 'Completed'),
-('S-2024-006', 1, '2024-02-12', '09:00:00', '12:00:00', 'Python Lab - Basic Exercises', 'Lab', 'Room 101', 'Completed'),
-('S-2024-007', 3, '2024-02-17', '08:00:00', '13:00:00', 'Introduction to Electrical Safety', 'Lecture', 'Room 201', 'Completed'),
-('S-2024-008', 3, '2024-02-24', '08:00:00', '13:00:00', 'Safety Standards and Regulations', 'Lecture', 'Room 201', 'Completed'),
-('S-2024-009', 3, '2024-03-02', '08:00:00', '13:00:00', 'Hazard Identification', 'Workshop', 'Room 201', 'Completed'),
-('S-2024-010', 5, '2024-02-25', '09:00:00', '14:00:00', 'Introduction to Project Management', 'Lecture', 'Room 301', 'Completed'),
-('S-2024-011', 5, '2024-03-03', '09:00:00', '14:00:00', 'Project Planning and Scheduling', 'Lecture', 'Room 301', 'Scheduled'),
-('S-2024-012', 7, '2024-02-12', '10:00:00', '13:00:00', 'AutoCAD Basics and Interface', 'Lecture', 'Room 202', 'Completed'),
-('S-2024-013', 7, '2024-02-14', '10:00:00', '13:00:00', '2D Drawing Fundamentals', 'Lecture', 'Room 202', 'Completed'),
-('S-2024-014', 7, '2024-02-16', '10:00:00', '13:00:00', 'AutoCAD Lab - Practice', 'Lab', 'Room 202', 'Completed');
+('S-2024-001', 1, 1, '2024-02-01', '09:00:00', '12:00:00', 'Introduction to Python', 'Lecture', 'Room 101', 'Completed'),
+('S-2024-002', 1, 1, '2024-02-03', '09:00:00', '12:00:00', 'Python Syntax and Data Types', 'Lecture', 'Room 101', 'Completed'),
+('S-2024-003', 1, 1, '2024-02-05', '09:00:00', '12:00:00', 'Control Structures', 'Lecture', 'Room 101', 'Completed'),
+('S-2024-004', 1, 1, '2024-02-08', '09:00:00', '12:00:00', 'Functions and Modules', 'Lecture', 'Room 101', 'Completed'),
+('S-2024-005', 1, 1, '2024-02-10', '09:00:00', '12:00:00', 'Object-Oriented Programming', 'Lecture', 'Room 101', 'Completed'),
+('S-2024-006', 1, 1, '2024-02-12', '09:00:00', '12:00:00', 'Python Lab - Basic Exercises', 'Lab', 'Room 101', 'Completed'),
+('S-2024-007', 3, 2, '2024-02-17', '08:00:00', '13:00:00', 'Introduction to Electrical Safety', 'Lecture', 'Room 201', 'Completed'),
+('S-2024-008', 3, 2, '2024-02-24', '08:00:00', '13:00:00', 'Safety Standards and Regulations', 'Lecture', 'Room 201', 'Completed'),
+('S-2024-009', 3, 2, '2024-03-02', '08:00:00', '13:00:00', 'Hazard Identification', 'Workshop', 'Room 201', 'Completed'),
+('S-2024-010', 5, 4, '2024-02-25', '09:00:00', '14:00:00', 'Introduction to Project Management', 'Lecture', 'Room 301', 'Completed'),
+('S-2024-011', 5, 4, '2024-03-03', '09:00:00', '14:00:00', 'Project Planning and Scheduling', 'Lecture', 'Room 301', 'Scheduled'),
+('S-2024-012', 7, 6, '2024-02-12', '10:00:00', '13:00:00', 'AutoCAD Basics and Interface', 'Lecture', 'Room 202', 'Completed'),
+('S-2024-013', 7, 6, '2024-02-14', '10:00:00', '13:00:00', '2D Drawing Fundamentals', 'Lecture', 'Room 202', 'Completed'),
+('S-2024-014', 7, 6, '2024-02-16', '10:00:00', '13:00:00', 'AutoCAD Lab - Practice', 'Lab', 'Room 202', 'Completed');
 
 -- ---------------------------------------------
 -- 9. ATTENDANCE RECORDS
@@ -273,34 +273,34 @@ INSERT INTO assessments (
     assessment_code, batch_id, title, description, assessment_type,
     max_marks, weightage_percent, passing_marks, assessment_date,
     start_time, end_time, duration_minutes, total_questions,
-    instructions, status
+    instructions, status, created_by
 ) VALUES
 ('A-2024-001', 1, 'Quiz 1 - Python Basics', 'Basic Python concepts and syntax', 'Quiz',
- 20, 20, 10, '2024-02-15', '09:00:00', '09:30:00', 30, 10, 'Answer all questions', 'Completed'),
+ 20, 20, 10, '2024-02-15', '09:00:00', '09:30:00', 30, 10, 'Answer all questions', 'Completed', 1),
 
-('A-2024-002', 1, 'Midterm - Python Programming', 'Comprehensive test on Python', 'Exam',
- 50, 30, 25, '2024-03-01', '09:00:00', '11:00:00', 120, 15, 'Choose the best answer', 'Completed'),
+('A-2024-002', 1, 'Midterm - Python Programming', 'Comprehensive test on Python', 'Midterm',
+ 50, 30, 25, '2024-03-01', '09:00:00', '11:00:00', 120, 15, 'Choose the best answer', 'Completed', 1),
 
 ('A-2024-003', 3, 'Quiz - Safety Standards', 'Safety regulations and standards', 'Quiz',
- 20, 20, 10, '2024-03-05', '10:00:00', '10:30:00', 30, 10, 'Multiple choice questions', 'Completed');
+ 20, 20, 10, '2024-03-05', '10:00:00', '10:30:00', 30, 10, 'Multiple choice questions', 'Completed', 1);
 
 -- ---------------------------------------------
 -- 11. TRAINEE RESULTS (REMOVED is_verified column)
 -- ---------------------------------------------
 INSERT INTO trainee_results (
     assessment_id, trainee_id, marks_obtained, percentage_score, grade,
-    status, comments
+    status, comments, recorded_by
 ) VALUES
-(1, 1, 18.00, 90.00, 'A', 'Pass', 'Excellent understanding'),
-(1, 2, 16.00, 80.00, 'A-', 'Pass', 'Good understanding'),
-(1, 3, 14.00, 70.00, 'B', 'Pass', 'Satisfactory'),
-(1, 4, 12.00, 60.00, 'C+', 'Pass', 'Average'),
-(2, 1, 42.00, 84.00, 'A-', 'Pass', 'Very good performance'),
-(2, 2, 38.00, 76.00, 'B+', 'Pass', 'Good performance'),
-(2, 3, 35.00, 70.00, 'B', 'Pass', 'Satisfactory'),
-(2, 4, 28.00, 56.00, 'C', 'Pass', 'Average'),
-(3, 5, 16.00, 80.00, 'A-', 'Pass', 'Good understanding'),
-(3, 6, 18.00, 90.00, 'A', 'Pass', 'Excellent');
+(1, 1, 18.00, 90.00, 'A', 'Pass', 'Excellent understanding', 1),
+(1, 2, 16.00, 80.00, 'A-', 'Pass', 'Good understanding', 1),
+(1, 3, 14.00, 70.00, 'B', 'Pass', 'Satisfactory', 1),
+(1, 4, 12.00, 60.00, 'C+', 'Pass', 'Average', 1),
+(2, 1, 42.00, 84.00, 'A-', 'Pass', 'Very good performance', 1),
+(2, 2, 38.00, 76.00, 'B+', 'Pass', 'Good performance', 1),
+(2, 3, 35.00, 70.00, 'B', 'Pass', 'Satisfactory', 1),
+(2, 4, 28.00, 56.00, 'C', 'Pass', 'Average', 1),
+(3, 5, 16.00, 80.00, 'A-', 'Pass', 'Good understanding', 1),
+(3, 6, 18.00, 90.00, 'A', 'Pass', 'Excellent', 1);
 
 -- ---------------------------------------------
 -- 12. USERS
