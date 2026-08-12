@@ -639,25 +639,18 @@
             };
             
             try {
-                let result;
-                
-                // Check if STTIMS_API is available
-                if (typeof STTIMS_API !== 'undefined' && STTIMS_API.AuthAPI) {
-                    result = await STTIMS_API.AuthAPI.login(credentials);
-                } else {
-                    // Fallback: direct fetch if API class not available
-                    const response = await fetch('/api/auth/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(credentials)
-                    });
-                    result = await response.json();
-                    if (!response.ok) {
-                        throw new Error(result.error || result.message || 'Login failed');
-                    }
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(credentials)
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || result.message || 'Login failed');
                 }
                 
                 // Login successful
