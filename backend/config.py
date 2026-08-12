@@ -28,7 +28,13 @@ class Config:
     # Session Configuration
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
+    # 'None' (not 'Lax') because the frontend and backend live on different
+    # onrender.com subdomains, which browsers treat as different *sites*
+    # (onrender.com is on the public suffix list) - 'Lax' cookies are never
+    # sent on the fetch() calls api.js makes. Requires Secure=True (above),
+    # which browsers mandate for SameSite=None cookies; satisfied since
+    # Render serves everything over HTTPS.
+    SESSION_COOKIE_SAMESITE = 'None'
     
     # Upload Configuration
     UPLOAD_FOLDER = 'uploads'
