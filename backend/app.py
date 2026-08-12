@@ -75,6 +75,13 @@ def create_app(config_class=None):
     
     # Create Flask app
     app = Flask(__name__)
+
+    # Treat '/api/users' and '/api/users/' (and every other route) as
+    # identical, instead of issuing a 308 redirect for the missing slash.
+    # This matters because browsers refuse to follow redirects during a
+    # CORS preflight (OPTIONS) request - which only happens when frontend
+    # and backend are on different origins, as they are once deployed.
+    app.url_map.strict_slashes = False
     
     # Set secret key
     app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here-change-this-in-production')
