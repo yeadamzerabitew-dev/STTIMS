@@ -24,3 +24,8 @@ backend/aiven-ca.pem
 backend/deploy_db_setup.py
 backend/fix_missing_rows.py
 backend/create_tables_remote.py
+
+# One-off local scripts that may contain real credentials - never commit these
+backend/deploy_db_setup.py
+backend/fix_missing_rows.py
+backend/create_tables_remote.py

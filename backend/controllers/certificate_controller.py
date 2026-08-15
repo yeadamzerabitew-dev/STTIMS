@@ -319,15 +319,29 @@ class CertificateController:
             sort_order = request.args.get('sort_order', 'desc')
             
             query = Certificate.query
+            enrollment_joined = False
             
-            if trainee_id:
+            if current_user.role == 'Trainee':
+                # Trainees only ever see their own certificates - ignore any
+                # trainee_id passed in the query string, don't trust the client.
+                if not current_user.trainee_id:
+                    return jsonify({
+                        'data': [], 'total': 0, 'page': page,
+                        'per_page': per_page, 'total_pages': 0
+                    }), 200
+                query = query.join(Enrollment).filter(Enrollment.trainee_id == current_user.trainee_id)
+                enrollment_joined = True
+            elif trainee_id:
                 query = query.join(Enrollment).filter(Enrollment.trainee_id == trainee_id)
+                enrollment_joined = True
             
             if status:
                 query = query.filter(Certificate.status == status)
             
             if search:
-                query = query.join(Enrollment).join(Trainee).filter(
+                if not enrollment_joined:
+                    query = query.join(Enrollment)
+                query = query.join(Trainee).filter(
                     (Trainee.first_name.ilike(f'%{search}%')) |
                     (Trainee.last_name.ilike(f'%{search}%')) |
                     (Certificate.certificate_number.ilike(f'%{search}%'))
