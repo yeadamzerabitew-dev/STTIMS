@@ -319,6 +319,17 @@ INSERT INTO users (
 ('trainee4', 'desta.bekele@email.com', 'scrypt:32768:8:1$dummy$dummy_hash', 'Trainee', 4, NULL, 'Active'),
 ('trainee5', 'emebet.girma@email.com', 'scrypt:32768:8:1$dummy$dummy_hash', 'Trainee', 5, NULL, 'Active');
 
+-- ---------------------------------------------
+-- 13. CERTIFICATES
+-- ---------------------------------------------
+INSERT INTO certificates (
+    certificate_number, verification_token, enrollment_id, approved_by,
+    issue_date, issue_reason, status
+) VALUES
+('CERT-2024-0001', 'VERIFY-TOKEN-0001-A1B2C3D4E5F6', 1, 1, '2024-04-01', 'Course Completion', 'Issued'),
+('CERT-2024-0002', 'VERIFY-TOKEN-0002-B2C3D4E5F6A1', 2, 1, '2024-04-02', 'Course Completion', 'Issued'),
+('CERT-2024-0003', 'VERIFY-TOKEN-0003-C3D4E5F6A1B2', 9, 1, '2024-03-15', 'Course Completion', 'Issued');
+
 -- =============================================
 -- SAFETY NET: fix any NULL numeric columns that would
 -- otherwise crash the Flask app's property calculations
