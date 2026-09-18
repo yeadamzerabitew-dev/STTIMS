@@ -26,15 +26,9 @@ class Config:
     SQLALCHEMY_ECHO = False  # Set to True for debugging SQL queries
     
     # Session Configuration
-    SESSION_COOKIE_SECURE = True
+    # SESSION_COOKIE_SECURE and SESSION_COOKIE_SAMESITE are set per-environment
+    # below (DevelopmentConfig vs ProductionConfig) - see those classes for why.
     SESSION_COOKIE_HTTPONLY = True
-    # 'None' (not 'Lax') because the frontend and backend live on different
-    # onrender.com subdomains, which browsers treat as different *sites*
-    # (onrender.com is on the public suffix list) - 'Lax' cookies are never
-    # sent on the fetch() calls api.js makes. Requires Secure=True (above),
-    # which browsers mandate for SameSite=None cookies; satisfied since
-    # Render serves everything over HTTPS.
-    SESSION_COOKIE_SAMESITE = 'None'
     
     # Upload Configuration
     UPLOAD_FOLDER = 'uploads'
@@ -58,9 +52,23 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_ECHO = True
 
+    # Local dev: frontend and backend are both plain HTTP on 127.0.0.1, so
+    # a Secure cookie would never be stored at all. 'Lax' is fine locally
+    # since everything shares the same site (127.0.0.1).
+    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SAMESITE = 'Lax'
+
 class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_ECHO = False
+
+    # Deployed: frontend and backend live on different onrender.com
+    # subdomains, which browsers treat as different *sites* (onrender.com
+    # is on the public suffix list) - 'Lax' cookies are never sent on the
+    # fetch() calls api.js makes, so this must be 'None' + Secure=True
+    # (required together; satisfied since Render serves everything over HTTPS).
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'None'
     
     # In production, you should have a proper secret key
     SECRET_KEY = os.environ.get('SECRET_KEY')

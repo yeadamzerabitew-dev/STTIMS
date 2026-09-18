@@ -1,0 +1,195 @@
+/* ============================================
+   STTIMS - Dark Mode
+   Activated by adding data-theme="dark" to <html>.
+   Overrides the CSS variables from style.css, plus the
+   Bootstrap component surfaces that don't use them.
+   ============================================ */
+
+[data-theme="dark"] {
+    /* Remap the core palette. Brand colors (primary/secondary/
+       success/warning/danger/info) stay the same so the app keeps
+       its identity; only the neutrals flip. */
+    --dark: #E5E7EB;        /* was near-black text -> now light text */
+    --light: #111827;       /* was page background -> now near-black */
+    --white: #1F2937;       /* was card/panel surface -> now dark gray */
+    --gray: #9CA3AF;        /* muted text, lightened for contrast */
+
+    --surface: #1F2937;     /* cards, modals, dropdowns */
+    --surface-raised: #374151; /* hover states, inputs */
+    --border: #374151;
+    --text: #E5E7EB;
+    --text-muted: #9CA3AF;
+}
+
+[data-theme="dark"] body {
+    background-color: #111827;
+    color: var(--text);
+}
+
+/* ---- Cards / panels ---- */
+[data-theme="dark"] .card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .dropdown-menu,
+[data-theme="dark"] .list-group-item,
+[data-theme="dark"] .accordion-item {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-footer,
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .stat-card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] .stat-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+/* ---- Text utilities ---- */
+[data-theme="dark"] .text-dark { color: var(--text) !important; }
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .text-secondary { color: var(--text-muted) !important; }
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-light {
+    background-color: var(--surface) !important;
+    color: var(--text);
+}
+
+/* ---- Tables ---- */
+[data-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text);
+    --bs-table-border-color: var(--border);
+    --bs-table-striped-bg: rgba(255,255,255,0.03);
+    --bs-table-striped-color: var(--text);
+    --bs-table-hover-bg: rgba(255,255,255,0.06);
+    --bs-table-hover-color: var(--text);
+    color: var(--text);
+}
+[data-theme="dark"] .table > :not(caption) > * > * {
+    border-bottom-color: var(--border);
+}
+/* table-dark headers already dark - soften so they don't vanish */
+[data-theme="dark"] .table-dark,
+[data-theme="dark"] .table .table-dark {
+    --bs-table-bg: #111827;
+    --bs-table-color: var(--text);
+    --bs-table-border-color: var(--border);
+}
+
+/* ---- Forms ---- */
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .input-group-text {
+    background-color: var(--surface-raised);
+    border-color: var(--border);
+    color: var(--text);
+}
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--surface-raised);
+    border-color: var(--primary);
+    color: var(--text);
+    box-shadow: 0 0 0 0.2rem rgba(79,70,229,0.25);
+}
+[data-theme="dark"] .form-control::placeholder { color: #6B7280; }
+[data-theme="dark"] .form-label,
+[data-theme="dark"] .form-check-label,
+[data-theme="dark"] .col-form-label { color: var(--text); }
+
+/* Navbar search field sits on the gradient - keep it readable */
+[data-theme="dark"] .navbar .form-control {
+    background-color: rgba(255,255,255,0.15);
+    color: #fff;
+}
+[data-theme="dark"] .navbar .form-control::placeholder { color: rgba(255,255,255,0.7); }
+
+/* ---- Dropdowns ---- */
+[data-theme="dark"] .dropdown-item { color: var(--text); }
+[data-theme="dark"] .dropdown-item:hover,
+[data-theme="dark"] .dropdown-item:focus {
+    background-color: var(--surface-raised);
+    color: #fff;
+}
+[data-theme="dark"] .dropdown-divider { border-color: var(--border); }
+[data-theme="dark"] .dropdown-header { color: var(--text-muted); }
+
+/* ---- Footer / breadcrumb / misc ---- */
+[data-theme="dark"] .footer {
+    background: var(--surface);
+    border-top-color: var(--border);
+    color: var(--text-muted);
+}
+[data-theme="dark"] .breadcrumb-item a { color: var(--text-muted); }
+[data-theme="dark"] .breadcrumb-item.active { color: var(--text); }
+[data-theme="dark"] .breadcrumb-item + .breadcrumb-item::before { color: var(--text-muted); }
+
+[data-theme="dark"] .border,
+[data-theme="dark"] .border-top,
+[data-theme="dark"] .border-bottom,
+[data-theme="dark"] .border-start,
+[data-theme="dark"] .border-end { border-color: var(--border) !important; }
+
+[data-theme="dark"] hr { border-color: var(--border); }
+
+/* ---- Pagination ---- */
+[data-theme="dark"] .page-link {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+}
+[data-theme="dark"] .page-link:hover {
+    background-color: var(--surface-raised);
+    color: #fff;
+}
+[data-theme="dark"] .page-item.disabled .page-link {
+    background-color: var(--surface);
+    color: #6B7280;
+}
+
+/* ---- Buttons that assume a light background ---- */
+[data-theme="dark"] .btn-light {
+    background-color: var(--surface-raised);
+    border-color: var(--border);
+    color: var(--text);
+}
+[data-theme="dark"] .btn-light:hover {
+    background-color: #4B5563;
+    color: #fff;
+}
+[data-theme="dark"] .btn-outline-secondary {
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+[data-theme="dark"] .btn-outline-secondary:hover {
+    background-color: var(--surface-raised);
+    color: #fff;
+}
+[data-theme="dark"] .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+
+/* ---- Certificate preview stays light on purpose ----
+   A certificate is a printable document; inverting it would look
+   wrong on screen and break the printed/PDF output. */
+[data-theme="dark"] .certificate-preview {
+    background: #ffffff;
+    color: #1F2937;
+}
+
+/* ---- Theme toggle button ---- */
+.theme-toggle {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.9);
+    padding: 0.375rem 0.75rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.theme-toggle:hover { color: #fff; }
